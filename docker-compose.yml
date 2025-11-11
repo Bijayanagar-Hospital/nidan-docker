@@ -1,0 +1,268 @@
+services:
+  nidan-proxy:
+    image: traefik:v3.1
+    command:
+      - --api.dashboard=true
+      - --entrypoints.web.address=:${TRAEFIK_HTTP_PORT}
+      - --entrypoints.websecure.address=:${TRAEFIK_HTTPS_PORT}
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --certificatesresolvers.letsencrypt.acme.email=${TRAEFIK_ACME_EMAIL}
+      - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
+      - --certificatesresolvers.letsencrypt.acme.tlschallenge=true
+      - --serversTransport.insecureSkipVerify=true
+      - --ping=true
+    ports:
+      - "${TRAEFIK_HTTP_PORT:-80}:80"
+      - "${TRAEFIK_HTTPS_PORT:-443}:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik-lets-encrypt:/letsencrypt
+    healthcheck:
+      test: ["CMD", "traefik", "healthcheck", "--ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.traefik.rule=Host(`${TRAEFIK_DASHBOARD_HOST}`)
+      - traefik.http.routers.traefik.entrypoints=websecure
+      - traefik.http.routers.traefik.tls.certresolver=letsencrypt
+      - traefik.http.services.traefik.loadbalancer.server.port=8080
+      - traefik.http.middlewares.traefik-redirect.redirectscheme.scheme=https
+      - traefik.http.middlewares.openmrs-redirect.redirectscheme.scheme=https
+      - traefik.http.middlewares.openmrs-spa-strip.stripprefixregex.regex=^/openmrs/spa
+      - traefik.http.routers.traefik-http.rule=Host(`${TRAEFIK_DASHBOARD_HOST}`)
+      - traefik.http.routers.traefik-http.entrypoints=web
+      - traefik.http.routers.traefik-http.middlewares=traefik-redirect
+    networks:
+      - his_core
+    profiles: ["core", "elis", "odoo", "reports"]
+
+  openmrs-db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${OPENMRS_DB_NAME}
+      POSTGRES_USER: ${OPENMRS_DB_USER}
+      POSTGRES_PASSWORD: ${OPENMRS_DB_PASSWORD}
+      TZ: ${DEFAULT_TIMEZONE}
+    volumes:
+      - openmrs-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d ${OPENMRS_DB_NAME} -U ${OPENMRS_DB_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+    networks:
+      - his_core
+    profiles: ["core", "reports"]
+
+  openelis-db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${OPENELIS_DB_NAME}
+      POSTGRES_USER: ${OPENELIS_DB_USER}
+      POSTGRES_PASSWORD: ${OPENELIS_DB_PASSWORD}
+      TZ: ${DEFAULT_TIMEZONE}
+    volumes:
+      - openelis-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d ${OPENELIS_DB_NAME} -U ${OPENELIS_DB_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+    networks:
+      - his_core
+    profiles: ["elis"]
+
+  odoo-db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${ODOO_DB_NAME}
+      POSTGRES_USER: ${ODOO_DB_USER}
+      POSTGRES_PASSWORD: ${ODOO_DB_PASSWORD}
+      TZ: ${DEFAULT_TIMEZONE}
+    volumes:
+      - odoo-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d ${ODOO_DB_NAME} -U ${ODOO_DB_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+    networks:
+      - his_core
+    profiles: ["odoo"]
+
+  openmrs-backend:
+    image: openmrs/openmrs-reference-application-3-backend:${OPENMRS_IMAGE_TAG:-qa}
+    restart: unless-stopped
+    env_file:
+      - config/env/openmrs-backend.env
+    environment:
+      OMRS_RUNTIME_PROPERTIES_FILE: /openmrs/openmrs-runtime.properties
+      TZ: ${DEFAULT_TIMEZONE}
+    depends_on:
+      openmrs-db:
+        condition: service_healthy
+    volumes:
+      - openmrs-appdata:/openmrs/data
+      - ./config/openmrs/openmrs-runtime.properties:/openmrs/data/openmrs-runtime.properties:ro
+      - ./config/openmrs/modules:/openmrs/modules
+      - ./config/openmrs/lib:/openmrs/lib
+      - ./config/openmrs/initializer:/openmrs/initializer
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/openmrs/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.openmrs-api.rule=Host(`${OPENMRS_HOST}`) && PathPrefix(`/openmrs`) && !PathPrefix(`/openmrs/spa`)
+      - traefik.http.routers.openmrs-api.entrypoints=websecure
+      - traefik.http.routers.openmrs-api.tls.certresolver=letsencrypt
+      - traefik.http.routers.openmrs-api.service=openmrs-api
+      - traefik.http.services.openmrs-api.loadbalancer.server.port=8080
+      - traefik.http.routers.openmrs-api-http.rule=Host(`${OPENMRS_HOST}`) && PathPrefix(`/openmrs`) && !PathPrefix(`/openmrs/spa`)
+      - traefik.http.routers.openmrs-api-http.entrypoints=web
+      - traefik.http.routers.openmrs-api-http.middlewares=openmrs-redirect
+    networks:
+      - his_core
+    ports:
+      - "8080:8080"
+    profiles: ["core"]
+
+  openmrs-frontend:
+    image: openmrs/openmrs-reference-application-3-frontend:${OPENMRS_IMAGE_TAG:-qa}
+    restart: unless-stopped
+    environment:
+      TZ: ${DEFAULT_TIMEZONE}
+    depends_on:
+      openmrs-backend:
+        condition: service_started
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:80 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.openmrs-spa.rule=Host(`${OPENMRS_HOST}`) && PathPrefix(`/openmrs/spa`)
+      - traefik.http.routers.openmrs-spa.entrypoints=websecure
+      - traefik.http.routers.openmrs-spa.tls.certresolver=letsencrypt
+      - traefik.http.routers.openmrs-spa.middlewares=openmrs-spa-strip
+      - traefik.http.routers.openmrs-spa.service=openmrs-spa
+      - traefik.http.services.openmrs-spa.loadbalancer.server.port=80
+      - traefik.http.routers.openmrs-spa-http.rule=Host(`${OPENMRS_HOST}`) && PathPrefix(`/openmrs/spa`)
+      - traefik.http.routers.openmrs-spa-http.entrypoints=web
+      - traefik.http.routers.openmrs-spa-http.middlewares=openmrs-redirect,openmrs-spa-strip
+    networks:
+      - his_core
+    profiles: ["core"]
+
+  openelis-app:
+    image: itechuw/openelis-global-2:develop
+    platform: linux/amd64
+    restart: unless-stopped
+    env_file:
+      - config/env/openelis.env
+    depends_on:
+      openelis-db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/OpenELIS-Global || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    labels:
+      - traefik.enable=true
+      - traefik.http.middlewares.openelis-redirect.redirectscheme.scheme=https
+      - traefik.http.routers.openelis-http.rule=Host(`${OPENELIS_HOST}`)
+      - traefik.http.routers.openelis-http.entrypoints=web
+      - traefik.http.routers.openelis-http.middlewares=openelis-redirect
+      - traefik.http.routers.openelis.rule=Host(`${OPENELIS_HOST}`)
+      - traefik.http.routers.openelis.entrypoints=websecure
+      - traefik.http.routers.openelis.tls.certresolver=letsencrypt
+      - traefik.http.services.openelis.loadbalancer.server.port=8080
+    networks:
+      - his_core
+    ports:
+      - "8070:8080"
+    profiles: ["elis"]
+
+  odoo:
+    image: odoo:19.0
+    restart: unless-stopped
+    env_file:
+      - config/env/odoo.env
+    depends_on:
+      odoo-db:
+        condition: service_healthy
+    volumes:
+      - odoo-data:/var/lib/odoo
+      - odoo-addons:/mnt/extra-addons
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8069/web/database/selector || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    labels:
+      - traefik.enable=true
+      - traefik.http.middlewares.odoo-redirect.redirectscheme.scheme=https
+      - traefik.http.routers.odoo-http.rule=Host(`${ODOO_HOST}`)
+      - traefik.http.routers.odoo-http.entrypoints=web
+      - traefik.http.routers.odoo-http.middlewares=odoo-redirect
+      - traefik.http.routers.odoo.rule=Host(`${ODOO_HOST}`)
+      - traefik.http.routers.odoo.entrypoints=websecure
+      - traefik.http.routers.odoo.tls.certresolver=letsencrypt
+      - traefik.http.services.odoo.loadbalancer.server.port=8069
+    networks:
+      - his_core
+    ports:
+      - "8069:8069"
+    profiles: ["odoo"]
+
+  bahmni-reports:
+    image: bahmni/reports:1.0.0
+    restart: unless-stopped
+    env_file:
+      - config/env/bahmni-reports.env
+    depends_on:
+      openmrs-db:
+        condition: service_healthy
+      openmrs-backend:
+        condition: service_started
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    labels:
+      - traefik.enable=true
+      - traefik.http.middlewares.reports-redirect.redirectscheme.scheme=https
+      - traefik.http.routers.reports-http.rule=Host(`${BAHMNI_REPORTS_HOST}`)
+      - traefik.http.routers.reports-http.entrypoints=web
+      - traefik.http.routers.reports-http.middlewares=reports-redirect
+      - traefik.http.routers.reports.rule=Host(`${BAHMNI_REPORTS_HOST}`)
+      - traefik.http.routers.reports.entrypoints=websecure
+      - traefik.http.routers.reports.tls.certresolver=letsencrypt
+      - traefik.http.services.reports.loadbalancer.server.port=8080
+    networks:
+      - his_core
+    profiles: ["reports"]
+
+networks:
+  his_core:
+    driver: bridge
+
+volumes:
+  traefik-lets-encrypt:
+  openmrs-db-data:
+  openelis-db-data:
+  odoo-db-data:
+  openmrs-appdata:
+  odoo-data:
+  odoo-addons:
+
