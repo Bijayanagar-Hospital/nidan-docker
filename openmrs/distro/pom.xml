@@ -148,12 +148,6 @@
     </dependency>
     <dependency>
       <groupId>org.bahmni.module</groupId>
-      <artifactId>appointments-omod</artifactId>
-      <version>${appointments.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.bahmni.module</groupId>
       <artifactId>teleconsultation-omod</artifactId>
       <version>${teleconsultation.version}</version>
       <scope>provided</scope>
