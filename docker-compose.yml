@@ -40,19 +40,6 @@ services:
       - OPENELIS_CONTEXT_PATH=${OPENELIS_CONTEXT_PATH:-/api/OpenELIS-Global/}
     networks:
       - nidan-network
-    depends_on:
-      openmrs-frontend:
-        condition: service_healthy
-      odoo:
-        condition: service_healthy
-      keycloak:
-        condition: service_started
-      openelis:
-        condition: service_started
-      openelis-frontend:
-        condition: service_started
-      nidan-certbot:
-        condition: service_started
     volumes:
       - certbot-etc:/etc/letsencrypt
       - certbot-www:/var/www/certbot
@@ -82,7 +69,8 @@ services:
       OMRS_DB_USERNAME: ${OPENMRS_DB_USER}
       OMRS_DB_PASSWORD: ${OPENMRS_DB_PASSWORD}
       OMRS_DB_DRIVER_CLASS: org.postgresql.Driver
-      OMRS_DB_URL: jdbc:postgresql://openmrs-db:5432/${OPENMRS_DB_NAME}?autoReconnect=true
+      OMRS_DB_URL: jdbc:postgresql://openmrs-db:5432/${OPENMRS_DB_NAME}?stringtype=unspecified
+      OMRS_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQL95Dialect
       # Legacy connection config properties just in case
       OMRS_CONFIG_CONNECTION_SERVER: openmrs-db
       OMRS_CONFIG_CONNECTION_PORT: "5432"
@@ -90,7 +78,7 @@ services:
       OMRS_CONFIG_CONNECTION_USERNAME: ${OPENMRS_DB_USER}
       OMRS_CONFIG_CONNECTION_PASSWORD: ${OPENMRS_DB_PASSWORD}
       OMRS_CONFIG_CONNECTION_DRIVER_CLASS: org.postgresql.Driver
-      OMRS_CONFIG_CONNECTION_URL: jdbc:postgresql://openmrs-db:5432/${OPENMRS_DB_NAME}?autoReconnect=true
+      OMRS_CONFIG_CONNECTION_URL: jdbc:postgresql://openmrs-db:5432/${OPENMRS_DB_NAME}?stringtype=unspecified
     networks:
       - nidan-network
     depends_on:
@@ -336,7 +324,7 @@ services:
       - "15432:5432"
     environment:
       POSTGRES_DB: ${OPENELIS_DB_NAME:-clinlims}
-      POSTGRES_USER: ${OPENELIS_DB_USER:-postgres}
+      POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${OPENELIS_DB_PASSWORD:-changeme}
       DB_PASSWORD: ${OPENELIS_DB_PASSWORD:-changeme}
       DB_SUPERUSER_PASSWORD: ${OPENELIS_DB_PASSWORD:-changeme}

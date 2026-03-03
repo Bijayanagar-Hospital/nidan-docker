@@ -76,6 +76,37 @@
             color: #7f8c8d;
         }
 
+        .status-badge {
+            align-self: flex-start;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            width: fit-content;
+        }
+
+        .status-online {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .status-offline {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+
+        .status-checking {
+            background-color: #fff3e0;
+            color: #ef6c00;
+        }
+
+        .card.offline {
+            opacity: 0.6;
+            pointer-events: none;
+            filter: grayscale(1);
+        }
+
         /* Footer Styling */
         footer {
             width: 100%;
@@ -145,48 +176,56 @@
 
         <div class="grid">
             <!-- OpenMRS -->
-            <a href="/openmrs/spa/index.html" target="_blank" class="card">
+            <a href="/openmrs/spa/index.html" target="_blank" class="card" id="card-openmrs">
+                <div class="status-badge status-checking" id="status-openmrs">Checking...</div>
                 <div class="icon">🏥</div>
                 <div class="title">OpenMRS 3.0</div>
                 <div class="desc">Electronic Medical Record</div>
             </a>
 
             <!-- OpenELIS -->
-            <a href="http://localhost/openelis" target="_blank" class="card">
+            <a href="http://localhost/openelis" target="_blank" class="card" id="card-openelis">
+                <div class="status-badge status-checking" id="status-openelis">Checking...</div>
                 <div class="icon">🔬</div>
                 <div class="title">OpenELIS</div>
                 <div class="desc">Laboratory Information System</div>
             </a>
 
             <!-- Odoo -->
-            <a href="http://localhost:8069" target="_blank" class="card">
+            <a href="http://localhost:8069" target="_blank" class="card" id="card-odoo">
+                <div class="status-badge status-checking" id="status-odoo">Checking...</div>
                 <div class="icon">📊</div>
                 <div class="title">Odoo 19</div>
                 <div class="desc">ERP & Inventory</div>
             </a>
 
-            <!-- Orthanc (Explorer 2) -->
-            <a href="/orthanc-container/ui/app/index.html#/" target="_blank" class="card">
+            <!-- Orthanc -->
+            <a href="/orthanc-container/ui/app/index.html#/" target="_blank" class="card" id="card-orthanc">
+                <div class="status-badge status-checking" id="status-orthanc">Checking...</div>
                 <div class="icon">🦴</div>
                 <div class="title">Orthanc</div>
                 <div class="desc">PACS & Imaging (Explorer 2)</div>
             </a>
 
             <!-- Keycloak -->
-            <a href="/auth/" target="_blank" class="card">
+            <a href="/auth/" target="_blank" class="card" id="card-keycloak">
+                <div class="status-badge status-checking" id="status-keycloak">Checking...</div>
                 <div class="icon">🔐</div>
                 <div class="title">Keycloak</div>
                 <div class="desc">Identity Management</div>
             </a>
 
             <!-- Superset -->
-            <a href="/superset/" target="_blank" class="card">
+            <a href="/superset/" target="_blank" class="card" id="card-superset">
+                <div class="status-badge status-checking" id="status-superset">Checking...</div>
                 <div class="icon">📈</div>
                 <div class="title">Apache Superset</div>
                 <div class="desc">Analytics & Business Intelligence</div>
             </a>
-            <!-- DHIS2 / Federal HMIS Integration -->
-            <a href="/dhis2/" target="_blank" class="card">
+
+            <!-- DHIS2 -->
+            <a href="/dhis2/" target="_blank" class="card" id="card-dhis2">
+                <div class="status-badge status-checking" id="status-dhis2">Checking...</div>
                 <div class="icon">📡</div>
                 <div class="title">DHIS2 Integration</div>
                 <div class="desc">Federal & Provincial HMIS Reporting</div>
@@ -204,6 +243,55 @@
             <p class="footer-copyright">© 2025 NidanEHR. All rights reserved.</p>
         </div>
     </footer>
+
+    <script>
+        const services = [
+            { id: 'openmrs', url: '/openmrs/spa/config.json' },
+            { id: 'openelis', url: '/openelis/' },
+            { id: 'odoo', url: '/odoo/web/login' },
+            { id: 'orthanc', url: '/auth-ping/orthanc' },
+            { id: 'keycloak', url: '/auth/realms/master/.well-known/openid-configuration' },
+            { id: 'superset', url: '/superset/' },
+            { id: 'dhis2', url: '/dhis2/auth/login' }
+        ];
+
+        async function checkHealth() {
+            for (const service of services) {
+                const card = document.getElementById(`card-${service.id}`);
+                const statusBadge = document.getElementById(`status-${service.id}`);
+                if (!card || !statusBadge) continue;
+
+                try {
+                    const response = await fetch(service.url, { method: 'GET', cache: 'no-cache' });
+                    // NGINX returns 502/503/504 when the upstream container is down or starting
+                    if (response.status === 502 || response.status === 503 || response.status === 504) {
+                        setOffline(card, statusBadge);
+                    } else {
+                        // Any other status (including 401/404 redirects) means the backend container answered
+                        setOnline(card, statusBadge);
+                    }
+                } catch (error) {
+                    setOffline(card, statusBadge);
+                }
+            }
+        }
+
+        function setOnline(card, badge) {
+            card.classList.remove('offline');
+            badge.className = 'status-badge status-online';
+            badge.innerText = 'Online';
+        }
+
+        function setOffline(card, badge) {
+            card.classList.add('offline');
+            badge.className = 'status-badge status-offline';
+            badge.innerText = 'Offline';
+        }
+
+        // Run immediately, then poll every 15 seconds
+        checkHealth();
+        setInterval(checkHealth, 15000);
+    </script>
 </body>
 
 </html>

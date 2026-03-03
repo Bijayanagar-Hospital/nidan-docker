@@ -10,6 +10,7 @@ COPY nginx.conf /etc/nginx/nginx.conf.template
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 COPY index.html /usr/share/nginx/html/index.html
+COPY 502.html /usr/share/nginx/html/502.html
 COPY nidan-logo.png /usr/share/nginx/html/nidan-logo.png
 COPY trigonal-logo.png /usr/share/nginx/html/trigonal-logo.png
 

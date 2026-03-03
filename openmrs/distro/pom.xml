@@ -136,12 +136,6 @@
     </dependency>
     <dependency>
       <groupId>org.openmrs.module</groupId>
-      <artifactId>referencedemodata-omod</artifactId>
-      <version>${referencedemodata.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.openmrs.module</groupId>
       <artifactId>queue-omod</artifactId>
       <version>${queue.version}</version>
       <scope>provided</scope>

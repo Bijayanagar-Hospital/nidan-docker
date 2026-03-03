@@ -1,0 +1,12 @@
+Uuid,Void/Retire,Name,Description,Parent,Tag|Login Location,Tag|Visit Location,Tag|Facility Location,Tag|Queue Location,Tag|Admission Location,Tag|Appointment Location,Tag|Transfer Location,Address 1,Address 2,Address 3,Address 4,Address 5,Address 6,City/Village,County/District,State/Province,Postal Code,Country,_order:1000
+f47ac10b-58cc-4372-a567-0e02b2c3d479,,Hospital,Hospital,,,TRUE,,,,,,,,,,,,,,,,,
+44c3efb0-2583-4c80-a79e-1f756a03c0a1,,Outpatinet (OPD),Outpatient (OPD),,TRUE,TRUE,TRUE,TRUE,,TRUE,,,,,,,,,,,,,
+3c3a9dc6-83ed-4bc4-a998-4844c6082b4f,,Registration Desk,Patient Registration,,TRUE,TRUE,,TRUE,,,,,,,,,,,,,,,
+ba685651-ed3b-4e63-9b35-78893060758a,,Inpatient (IPD),Inpatient Ward,,TRUE,TRUE,,TRUE,TRUE,,TRUE,,,,,,,,,,,,
+8d9045ad-50f0-45b8-93c8-3ed4bce19dbf,,Emergency,Emergency,,TRUE,TRUE,,TRUE,TRUE,,,,,,,,,,,,,,
+1ce1b7d4-c865-4178-82b0-5932e51503d6,,Denal,Dental,,TRUE,TRUE,,TRUE,,,,,,,,,,,,,,,
+a5473deb-9dc6-4e19-8a5a-cd11909e853a,,Radiology,Radiology,,TRUE,TRUE,,TRUE,,,,,,,,,,,,,,,
+39ff0e19-b463-499a-a583-5f94626a4981,,General Surgery,General Surgery,,TRUE,TRUE,,TRUE,,,,,,,,,,,,,,,
+a5cf9b91-bee1-43c6-b5df-656e8da380f1,,Opthalmology,Opthalmology,,TRUE,TRUE,,TRUE,,,,,,,,,,,,,,,
+6ebe9ec1-06e3-45cb-8466-dfd34da120c8,,"ENT (Ear, Nose, Throat)","ENT (Ear, Nose, Throat)",,TRUE,TRUE,,TRUE,,,,,,,,,,,,,,,
+1bb0d1c3-31f7-4418-afc9-e0e1e2676605,,Obstetrics and Gynecology,Obstetrics and Gynecology,,TRUE,TRUE,,TRUE,,,,,,,,,,,,,,,
