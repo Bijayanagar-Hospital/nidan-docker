@@ -48,16 +48,18 @@ EOSQL
 EOSQL
         
         # Write database connection to odoo.conf (only if not already present)
-        # Remove existing db_* entries first to avoid duplicates
-        sed -i '/^db_host =/d; /^db_user =/d; /^db_password =/d; /^db_port =/d; /^db_name =/d' /etc/odoo/odoo.conf
+        # Remove existing entries first to avoid duplicates
+        sed -i '/^db_host =/d; /^db_user =/d; /^db_password =/d; /^db_port =/d; /^db_name =/d; /^db_filter =/d; /^proxy_mode =/d' /etc/odoo/odoo.conf
         # Append database config
         echo "" >> /etc/odoo/odoo.conf
-        echo "# Database connection (set by entrypoint)" >> /etc/odoo/odoo.conf
+        echo "# Configured by entrypoint" >> /etc/odoo/odoo.conf
         echo "db_host = $DB_HOST" >> /etc/odoo/odoo.conf
         echo "db_user = $DB_USER" >> /etc/odoo/odoo.conf
         echo "db_password = $DB_PASS" >> /etc/odoo/odoo.conf
         echo "db_port = $DB_PORT" >> /etc/odoo/odoo.conf
         echo "db_name = $DB_NAME" >> /etc/odoo/odoo.conf
+        echo "db_filter = ${ODOO_DB_FILTER:-^${DB_NAME}\$}" >> /etc/odoo/odoo.conf
+        echo "proxy_mode = ${ODOO_PROXY_MODE:-True}" >> /etc/odoo/odoo.conf
     fi
     
     # Copy update-admin script if it exists
