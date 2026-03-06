@@ -184,7 +184,7 @@
             </a>
 
             <!-- OpenELIS -->
-            <a href="http://localhost/openelis" target="_blank" class="card" id="card-openelis">
+            <a href="/openelis" target="_blank" class="card" id="card-openelis">
                 <div class="status-badge status-checking" id="status-openelis">Checking...</div>
                 <div class="icon">🔬</div>
                 <div class="title">OpenELIS</div>
@@ -192,7 +192,7 @@
             </a>
 
             <!-- Odoo -->
-            <a href="/odoo/" target="_blank" class="card" id="card-odoo">
+            <a href="http://localhost:8069" target="_blank" class="card" id="card-odoo">
                 <div class="status-badge status-checking" id="status-odoo">Checking...</div>
                 <div class="icon">📊</div>
                 <div class="title">Odoo 19</div>
@@ -207,12 +207,12 @@
                 <div class="desc">PACS & Imaging (Explorer 2)</div>
             </a>
 
-            <!-- Keycloak -->
-            <a href="/auth/" target="_blank" class="card" id="card-keycloak">
-                <div class="status-badge status-checking" id="status-keycloak">Checking...</div>
-                <div class="icon">🔐</div>
-                <div class="title">Keycloak</div>
-                <div class="desc">Identity Management</div>
+            <!-- Middleware UI -->
+            <a href="/cis/dead-letters/index.html" target="_blank" class="card" id="card-cis">
+                <div class="status-badge status-checking" id="status-cis">Checking...</div>
+                <div class="icon">�</div>
+                <div class="title">Middleware UI</div>
+                <div class="desc">Integration & Error Management</div>
             </a>
 
             <!-- Superset -->
@@ -248,9 +248,9 @@
         const services = [
             { id: 'openmrs', url: '/openmrs/spa/config.json' },
             { id: 'openelis', url: '/openelis/' },
-            { id: 'odoo', url: '/odoo/web/health' },
+            { id: 'odoo', url: '/odoo-health/' },
             { id: 'orthanc', url: '/auth-ping/orthanc' },
-            { id: 'keycloak', url: '/auth/realms/master/.well-known/openid-configuration' },
+            { id: 'cis', url: '/cis/actuator/health' },
             { id: 'superset', url: '/superset/' },
             { id: 'dhis2', url: '/dhis2/auth/login' }
         ];

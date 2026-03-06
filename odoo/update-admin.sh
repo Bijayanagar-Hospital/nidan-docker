@@ -8,20 +8,21 @@ ADMIN_PASSWORD="${ODOO_ADMIN_PASSWORD:-admin}"
 ODOO_WEB_BASE_URL="${ODOO_WEB_BASE_URL}"
 ODOO_WEB_BASE_URL_FREEZE="${ODOO_WEB_BASE_URL_FREEZE:-True}"
 
-# Wait for Odoo to finish initialization and registry to be loaded
-echo "Waiting for Odoo to initialize (checking logs)..."
-# We check the logs for 'Registry loaded' to be sure we can run odoo shell
-# Max wait 300 seconds
-for i in {1..60}; do
-    if grep -q "Registry loaded" /var/lib/odoo/odoo.log 2>/dev/null || [ -f /var/lib/odoo/sessions/initialized ]; then
-        echo "Odoo Registry loaded!"
+# Wait for Odoo to be ready for shell commands
+echo "Waiting for Odoo to initialize database $DB_NAME..."
+while true; do
+    # Check if the res_users table exists (indicates base module is installed)
+    # Use postgres superuser for this check to be sure we can access it
+    if PGPASSWORD="${POSTGRES_PASSWORD:-odoo}" psql -h "${HOST:-odoo-db}" -U "${POSTGRES_USER:-odoo}" -d "$DB_NAME" -tc "SELECT 1 FROM information_schema.tables WHERE table_name = 'res_users'" 2>/dev/null | grep -q 1; then
+        echo "Odoo Registry Ready (res_users table found)!"
         break
+    else
+        echo "Odoo is still initializing (tables not ready yet)..."
     fi
-    echo "Waiting for Odoo Registry... ($i/60)"
     sleep 5
 done
 
-# Extra buffer
+# Extra buffer to ensure registry is fully stable
 sleep 5
 
 # Update config parameters using Odoo shell
