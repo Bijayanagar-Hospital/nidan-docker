@@ -1,4 +1,3 @@
-# syntax=docker/dockerfile:1
 
 ### Dev Stage
 FROM openmrs/openmrs-core:2.8.x-dev-amazoncorretto-21 AS dev
@@ -37,4 +36,17 @@ COPY --from=dev /openmrs/distribution/openmrs_owas /openmrs/distribution/openmrs
 COPY --from=dev /openmrs/distribution/openmrs_config /openmrs/distribution/openmrs_config
 
 # Copy custom modules AFTER the main modules (to add additional modules, not replace)
+# Also clean up any older versions that might conflict
+USER root
+RUN rm -f /openmrs/distribution/openmrs_modules/attachments-*.omod && \
+    rm -f /openmrs/distribution/openmrs_modules/appointments-*.omod && \
+    rm -f /openmrs/distribution/openmrs_modules/patientdocuments-*.omod && \
+    rm -f /openmrs/distribution/openmrs_modules/initializer-*.omod
+USER openmrs
 COPY custom_modules/ /openmrs/distribution/openmrs_modules/
+
+# Prepare OCL startup configuration
+RUN mkdir -p /openmrs/distribution/ocl/loadAtStartup
+
+# Copy Nidan Dialect jar
+COPY nidan-dialect.jar /usr/local/tomcat/lib/nidan-dialect.jar

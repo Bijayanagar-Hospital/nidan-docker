@@ -62,7 +62,8 @@ services:
   openmrs-backend:
     build: ./openmrs
     # image: openmrs/openmrs-reference-application-3-backend:${TAG:-qa}
-    # image: dipakthapa/openmrs-backend:latest
+    image: nidan-docker-openmrs-backend
+    user: root
     container_name: nidan-openmrs-backend
     environment:
       OMRS_CONFIG_MODULE_WEB_ADMIN: "true"
@@ -74,8 +75,9 @@ services:
       OMRS_DB_USERNAME: ${OPENMRS_DB_USER}
       OMRS_DB_PASSWORD: ${OPENMRS_DB_PASSWORD}
       OMRS_DB_DRIVER_CLASS: org.postgresql.Driver
+      OMRS_DB_ARGS: "?stringtype=unspecified"
       OMRS_DB_URL: jdbc:postgresql://openmrs-db:5432/${OPENMRS_DB_NAME}?stringtype=unspecified
-      OMRS_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQL95Dialect
+      OMRS_EXTRA_HIBERNATE_DIALECT: org.openmrs.hibernate.dialect.NidanPostgreSQLDialect
       # Legacy connection config properties just in case
       OMRS_CONFIG_CONNECTION_SERVER: openmrs-db
       OMRS_CONFIG_CONNECTION_PORT: "5432"
@@ -84,7 +86,7 @@ services:
       OMRS_CONFIG_CONNECTION_PASSWORD: ${OPENMRS_DB_PASSWORD}
       OMRS_CONFIG_CONNECTION_DRIVER_CLASS: org.postgresql.Driver
       OMRS_CONFIG_CONNECTION_URL: jdbc:postgresql://openmrs-db:5432/${OPENMRS_DB_NAME}?stringtype=unspecified
-      _JAVA_OPTIONS: "-Dcsrf.enabled=false -Dhibernate.type.preferred_boolean_jdbc_type=SMALLINT -Dhibernate.dialect=org.hibernate.dialect.PostgreSQL95Dialect"
+      _JAVA_OPTIONS: "-Dcsrf.enabled=false -Dhibernate.dialect=org.openmrs.hibernate.dialect.NidanPostgreSQLDialect -Dhibernate.jdbc.lob.non_contextual_creation=true -Dhibernate.show_sql=true -Dhibernate.format_sql=false"
     networks:
       - nidan-network
     depends_on:
@@ -92,8 +94,8 @@ services:
         condition: service_healthy
     volumes:
       - openmrs-data:/openmrs/data
-      # - ./openmrs/custom_modules:/openmrs/data/modules
-      #- ./openmrs/runtime/openmrs-runtime.properties:/openmrs/openmrs-runtime.properties
+      - ./openmrs/nidan-dialect.jar:/tmp/nidan-dialect.jar:ro
+      - ./openmrs/startup-custom.sh:/openmrs/startup.sh:ro
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8080/openmrs/" ]
       interval: 30s
