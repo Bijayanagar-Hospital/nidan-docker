@@ -9,7 +9,6 @@ volumes:
   odoo-db-data:
   orthanc-data:
   orthanc-db-data:
-
   nidan-openelis-data:
   openelis-db-data:
   openelis-lucene-index:
@@ -68,27 +67,20 @@ services:
     user: root
     container_name: nidan-openmrs-backend
     environment:
+      # Database (OMRS_DB_HOSTNAME/OMRS_DB_PORT used by wait-for-it.sh; OMRS_DB_URL for connection)
+      OMRS_DB: postgresql
+      OMRS_DB_HOSTNAME: openmrs-db
+      OMRS_DB_PORT: "5432"
+      OMRS_DB_URL: jdbc:postgresql://openmrs-db:5432/${OPENMRS_DB_NAME:-openmrs}?stringtype=unspecified
+      OMRS_DB_USERNAME: ${OPENMRS_DB_USER:-openmrs}
+      OMRS_DB_PASSWORD: ${OPENMRS_DB_PASSWORD:-openmrs}
+      # Installation (has_current_openmrs_database=true skips MySQL "create database" - postgres init already created it)
       OMRS_CONFIG_MODULE_WEB_ADMIN: "true"
       OMRS_CONFIG_AUTO_UPDATE_DATABASE: "true"
       OMRS_CONFIG_CREATE_TABLES: "true"
-      OMRS_DB_HOSTNAME: openmrs-db
-      OMRS_DB_PORT: "5432"
-      OMRS_DB_NAME: ${OPENMRS_DB_NAME}
-      OMRS_DB_USERNAME: ${OPENMRS_DB_USER}
-      OMRS_DB_PASSWORD: ${OPENMRS_DB_PASSWORD}
-      OMRS_DB_DRIVER_CLASS: org.postgresql.Driver
-      OMRS_DB_ARGS: "?stringtype=unspecified"
-      OMRS_DB_URL: jdbc:postgresql://openmrs-db:5432/${OPENMRS_DB_NAME}?stringtype=unspecified
-      OMRS_EXTRA_HIBERNATE_DIALECT: org.openmrs.hibernate.dialect.NidanPostgreSQLDialect
-      # Legacy connection config properties just in case
-      OMRS_CONFIG_CONNECTION_SERVER: openmrs-db
-      OMRS_CONFIG_CONNECTION_PORT: "5432"
-      OMRS_CONFIG_CONNECTION_DATABASE: ${OPENMRS_DB_NAME}
-      OMRS_CONFIG_CONNECTION_USERNAME: ${OPENMRS_DB_USER}
-      OMRS_CONFIG_CONNECTION_PASSWORD: ${OPENMRS_DB_PASSWORD}
-      OMRS_CONFIG_CONNECTION_DRIVER_CLASS: org.postgresql.Driver
-      OMRS_CONFIG_CONNECTION_URL: jdbc:postgresql://openmrs-db:5432/${OPENMRS_DB_NAME}?stringtype=unspecified
-      _JAVA_OPTIONS: "-Dcsrf.enabled=false -Dhibernate.dialect=org.openmrs.hibernate.dialect.NidanPostgreSQLDialect -Dhibernate.jdbc.lob.non_contextual_creation=true -Dhibernate.show_sql=true -Dhibernate.format_sql=false"
+      OMRS_CONFIG_HAS_CURRENT_OPENMRS_DATABASE: "true"
+      # JVM (Nidan dialect + PostgreSQL LOB handling)
+      _JAVA_OPTIONS: "-Dcsrf.enabled=false -Dhibernate.dialect=org.openmrs.hibernate.dialect.NidanPostgreSQLDialect -Dhibernate.jdbc.lob.non_contextual_creation=true"
     networks:
       - nidan-network
     depends_on:
@@ -134,16 +126,16 @@ services:
     command: >
       postgres -c wal_level=logical -c max_slot_wal_keep_size=${POSTGRES_MAX_SLOT_WAL_KEEP_SIZE:-1GB}
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${OPENMRS_DB_USER} -d ${OPENMRS_DB_NAME}" ]
+      test: [ "CMD-SHELL", "pg_isready -U ${OPENMRS_DB_USER:-openmrs} -d ${OPENMRS_DB_NAME:-openmrs}" ]
       interval: 5s
       timeout: 5s
       retries: 5
     ports:
       - "5433:5432"
     environment:
-      POSTGRES_DB: ${OPENMRS_DB_NAME}
-      POSTGRES_USER: ${OPENMRS_DB_USER}
-      POSTGRES_PASSWORD: ${OPENMRS_DB_PASSWORD}
+      POSTGRES_DB: ${OPENMRS_DB_NAME:-openmrs}
+      POSTGRES_USER: ${OPENMRS_DB_USER:-openmrs}
+      POSTGRES_PASSWORD: ${OPENMRS_DB_PASSWORD:-openmrs}
     volumes:
       - openmrs-db-data:/var/lib/postgresql/data
       - ./openmrs-db/init-openmrs-db.sql:/docker-entrypoint-initdb.d/init-openmrs-db.sql:ro
@@ -632,23 +624,61 @@ services:
       options:
         max-size: "10m"
         max-file: "5"
+  
   # ============================================================================
   # APACHE SUPERSET
   # ============================================================================
   superset:
-    image: apache/superset:GHA-dev-22136176777
+    build:
+      context: ./superset
+      dockerfile: Dockerfile
+    image: nidan/superset:latest
     container_name: nidan-superset
     ports:
-      - "8088:8088"
+      - "8088:8088"  # Keep for direct access during debugging, remove in production
     environment:
       SUPERSET_SECRET_KEY: ${SUPERSET_SECRET_KEY}
       SUPERSET_LOAD_EXAMPLES: ${SUPERSET_LOAD_EXAMPLES:-no}
       PYTHONPATH: /app/pythonpath
-    command: >
-      /bin/sh -c " superset db upgrade && superset fab create-admin --username ${SUPERSET_ADMIN_USERNAME:-admin} --firstname ${SUPERSET_ADMIN_FIRSTNAME:-Superset} --lastname ${SUPERSET_ADMIN_LASTNAME:-Admin} --email ${SUPERSET_ADMIN_EMAIL:-admin@superset.local} --password ${SUPERSET_ADMIN_PASSWORD:-admin} || true && superset init && superset run -h 0.0.0.0 -p 8088 --with-threads "
+      
+      # CRITICAL: Set the public-facing base URL
+      SUPERSET_WEBSERVER_ADDRESS: '0.0.0.0'
+      SUPERSET_WEBSERVER_PORT: '8088'
+      
+      # Tell Superset it's behind a reverse proxy at /superset/
+      SCRIPT_NAME: /superset
+      
+      # Database connections (seeded at startup for OpenMRS, OpenELIS, Odoo)
+      OPENMRS_DB_HOST: ${OPENMRS_DB_HOST:-openmrs-db}
+      OPENMRS_DB_PORT: ${OPENMRS_DB_PORT:-5432}
+      OPENMRS_DB_NAME: ${OPENMRS_DB_NAME:-openmrs}
+      OPENMRS_DB_USER: ${OPENMRS_DB_USER:-openmrs}
+      OPENMRS_DB_PASSWORD: ${OPENMRS_DB_PASSWORD:-openmrs}
+      OPENELIS_DB_HOST: ${OPENELIS_DB_HOST:-openelis-db}
+      OPENELIS_DB_PORT: ${OPENELIS_DB_PORT:-5432}
+      OPENELIS_DB_NAME: ${OPENELIS_DB_NAME:-clinlims}
+      OPENELIS_DB_USER: ${OPENELIS_DB_USER:-clinlims}
+      OPENELIS_DB_PASSWORD: ${OPENELIS_DB_PASSWORD:-clinlims}
+      ODOO_DB_HOST: ${ODOO_DB_HOST:-odoo-db}
+      ODOO_DB_PORT: ${ODOO_DB_PORT:-5432}
+      ODOO_DB_NAME: ${ODOO_DB_NAME:-nidan}
+      ODOO_DB_USER: ${ODOO_DB_USER:-nidan}
+      ODOO_DB_PASSWORD: ${ODOO_DB_PASSWORD:-nidan}
+      
+    command: ["/bin/sh", "/app/docker-entrypoint.sh"]
     networks:
       - nidan-network
+    depends_on:
+      openmrs-db:
+        condition: service_healthy
+      openelis-db:
+        condition: service_healthy
+      odoo-db:
+        condition: service_healthy
     volumes:
       - superset-home:/app/superset_home
       - ./superset/superset_config.py:/app/pythonpath/superset_config.py:ro
+      - ./superset/init_superset_metadata.py:/app/pythonpath/init_superset_metadata.py:ro
+      - ./superset/docker-entrypoint.sh:/app/docker-entrypoint.sh:ro
+      - ./superset/metadata:/app/superset_metadata:ro
     restart: unless-stopped

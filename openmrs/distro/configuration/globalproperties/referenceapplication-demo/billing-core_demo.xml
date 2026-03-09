@@ -1,8 +1,0 @@
-<config>
-    <globalProperties>
-        <globalProperty>
-            <property>billing.systemReceiptNumberGenerator</property>
-            <value>org.openmrs.module.billing.api.SequentialReceiptNumberGenerator</value>
-        </globalProperty>
-    </globalProperties>
-</config>
