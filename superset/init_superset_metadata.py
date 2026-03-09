@@ -63,6 +63,8 @@ def main():
             "visits_summary": [("visit_date", "DATE"), ("visit_type", "VARCHAR"), ("visit_count", "BIGINT"), ("unique_patients", "BIGINT")],
             "lab_tests_daily": [("test_date", "DATE"), ("test_name", "VARCHAR"), ("test_count", "BIGINT"), ("unique_patients", "BIGINT")],
             "daily_revenue": [("invoice_date", "DATE"), ("product_category", "VARCHAR"), ("revenue", "FLOAT"), ("invoice_count", "BIGINT")],
+            "near_expiry_medicines": [("drug_name", "VARCHAR"), ("lot_number", "VARCHAR"), ("expiration_date", "DATE"), ("days_until_expiry", "INTEGER"), ("quantity", "FLOAT")],
+            "low_stock_drugs": [("drug_name", "VARCHAR"), ("quantity_on_hand", "FLOAT")],
         }
 
         try:
@@ -377,6 +379,39 @@ def main():
                 GROUP BY DATE(am.invoice_date), COALESCE(pt.name->>'en_US', pt.name->>'en', 'Other') ORDER BY invoice_date DESC
             """)
 
+            # --- PHARMACY (Odoo stock) ---
+            # Near expiry: requires product_expiry module for expiration_date. Without it, shows drugs with lots (no expiry).
+            add_dataset("odoo", "near_expiry_medicines", """
+                SELECT COALESCE(pt.name->>'en_US', pt.name->>'en', 'Unknown') as drug_name,
+                    sl.name as lot_number,
+                    NULL::date as expiration_date,
+                    NULL::int as days_until_expiry,
+                    SUM(sq.quantity) as quantity
+                FROM stock_quant sq
+                JOIN stock_lot sl ON sq.lot_id = sl.id
+                JOIN product_product pp ON sq.product_id = pp.id
+                JOIN product_template pt ON pp.product_tmpl_id = pt.id
+                JOIN stock_location loc ON sq.location_id = loc.id
+                WHERE pt.clinical_product_type = 'drug'
+                    AND loc.usage = 'internal'
+                    AND sq.quantity > 0
+                GROUP BY pt.id, pt.name, sl.name
+                ORDER BY drug_name, sl.name
+            """)
+            add_dataset("odoo", "low_stock_drugs", """
+                SELECT COALESCE(pt.name->>'en_US', pt.name->>'en', 'Unknown') as drug_name,
+                    SUM(sq.quantity) as quantity_on_hand
+                FROM stock_quant sq
+                JOIN product_product pp ON sq.product_id = pp.id
+                JOIN product_template pt ON pp.product_tmpl_id = pt.id
+                JOIN stock_location loc ON sq.location_id = loc.id
+                WHERE pt.clinical_product_type = 'drug'
+                    AND loc.usage = 'internal'
+                GROUP BY pt.id, pt.name
+                HAVING SUM(sq.quantity) < 20
+                ORDER BY quantity_on_hand ASC
+            """)
+
             # Step 3: Create charts
             print("\nCreating charts...")
             charts = {}
@@ -482,6 +517,15 @@ def main():
                 "metrics": [{"expressionType": "SIMPLE", "column": {"column_name": "prescription_count"}, "aggregate": "SUM", "label": "Count"}],
                 "groupby": ["drug_name"],
             })
+            add_chart("near_expiry_medicines", "Near Expiry Medicines", "table", {
+                "all_columns": ["drug_name", "lot_number", "expiration_date", "days_until_expiry", "quantity"],
+                "order_by_cols": [["expiration_date", True]],
+                "row_limit": 50,
+            })
+            add_chart("low_stock_drugs", "Low Stock Drugs", "bar", {
+                "metrics": [{"expressionType": "SIMPLE", "column": {"column_name": "quantity_on_hand"}, "aggregate": "SUM", "label": "Qty"}],
+                "groupby": ["drug_name"],
+            })
             add_chart("average_length_of_stay", "Average Length of Stay", "echarts_timeseries", {
                 **base_params, "granularity_sqla": "admission_date",
                 "metrics": [{"expressionType": "SIMPLE", "column": {"column_name": "avg_los_days"}, "aggregate": "AVG", "label": "Days"}],
@@ -524,6 +568,16 @@ def main():
                 existing = db.session.query(Dashboard).filter_by(dashboard_title=title).first()
                 if existing:
                     print(f"  ✓ Dashboard '{title}' already exists")
+                    # Add any new charts that aren't on the dashboard yet
+                    existing_slice_ids = {s.id for s in existing.slices}
+                    added = 0
+                    for name in chart_names:
+                        if name in charts and charts[name] and charts[name].id not in existing_slice_ids:
+                            existing.slices.append(charts[name])
+                            added += 1
+                    if added:
+                        db.session.commit()
+                        print(f"    → Added {added} new chart(s)")
                     return existing
                 dashboard = Dashboard(dashboard_title=title, slug=title.lower().replace(" ", "-").replace("'", "")[:50], position_json="{}", published=True)
                 db.session.add(dashboard)
@@ -552,6 +606,8 @@ def main():
             ])
             create_dashboard("NidanEHR - Pharmacy Management", [
                 "Top Prescribed Drugs",
+                "Near Expiry Medicines",
+                "Low Stock Drugs",
             ])
             create_dashboard("NidanEHR - Quality Metrics", [
                 "Average Length of Stay", "Bed Occupancy Rate",
