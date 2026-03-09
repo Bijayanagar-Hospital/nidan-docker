@@ -60,8 +60,24 @@ EOSQL
         echo "db_name = $DB_NAME" >> /etc/odoo/odoo.conf
         echo "db_filter = ${ODOO_DB_FILTER:-^${DB_NAME}\$}" >> /etc/odoo/odoo.conf
         echo "proxy_mode = ${ODOO_PROXY_MODE:-True}" >> /etc/odoo/odoo.conf
+
+        # One-time install of base + all custom addons present in /mnt/extra-addons
+        ADDON_SENTINEL="/var/lib/odoo/.nidan-addons-installed"
+        if [ ! -f "$ADDON_SENTINEL" ]; then
+            ADDONS_DIR="/mnt/extra-addons"
+            CUSTOM_MODULES=""
+            for d in "$ADDONS_DIR"/*/; do
+                [ -f "${d}__manifest__.py" ] && CUSTOM_MODULES="${CUSTOM_MODULES}${CUSTOM_MODULES:+,}$(basename "$d")"
+            done
+            INIT_MODULES="base${CUSTOM_MODULES:+,$CUSTOM_MODULES}"
+            echo "First run: installing base and custom addons: $INIT_MODULES"
+            gosu odoo odoo -d "$DB_NAME" -i "$INIT_MODULES" --stop-after-init
+            touch "$ADDON_SENTINEL"
+            chown odoo:odoo "$ADDON_SENTINEL"
+            echo "Addons installed. Starting Odoo..."
+        fi
     fi
-    
+
     # Copy update-admin script if it exists
     if [ -f /entrypoint.sh.update-admin.sh ]; then
         cp /entrypoint.sh.update-admin.sh /tmp/update-admin.sh
@@ -69,10 +85,10 @@ EOSQL
         chown odoo:odoo /tmp/update-admin.sh
     fi
     
-    # Switch to odoo user and exec the command
-    # Start admin password update in background if password is set
-    if [ -f /tmp/update-admin.sh ] && [ -n "$ODOO_ADMIN_PASSWORD" ] && [ "$ODOO_ADMIN_PASSWORD" != "admin" ]; then
-        echo "Admin password update will run in background after Odoo starts..."
+    # Run admin password update only once (first init). Uses sentinel in odoo-data volume.
+    ADMIN_SENTINEL="/var/lib/odoo/.admin-initialized"
+    if [ ! -f "$ADMIN_SENTINEL" ] && [ -f /tmp/update-admin.sh ] && [ -n "$ODOO_ADMIN_PASSWORD" ] && [ "$ODOO_ADMIN_PASSWORD" != "admin" ]; then
+        echo "First run: admin password will be set in background..."
         gosu odoo /tmp/update-admin.sh &
     fi
     

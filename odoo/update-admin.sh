@@ -45,3 +45,6 @@ if '${ODOO_WEB_BASE_URL}':
 env.cr.commit()
 EOF
 
+# Mark admin as initialized so we don't reset password on every restart
+touch /var/lib/odoo/.admin-initialized 2>/dev/null || true
+

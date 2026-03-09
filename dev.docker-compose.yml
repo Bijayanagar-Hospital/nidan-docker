@@ -12,6 +12,7 @@ volumes:
   keycloak-db-data:
   openelis-db-data:
   openelis-lucene-index:
+  openelis-properties:
   certbot-etc:
   certbot-www:
   nidan-integration-db-data:
@@ -366,7 +367,7 @@ services:
     volumes:
       # IMPORTANT: Mount the fixed server.xml that enables HTTP on port 8080
       - ./openelis/tomcat/server.xml:/usr/local/tomcat/conf/server.xml:ro
-      - ./openelis/volume/properties:/var/lib/openelis-global/properties
+      - openelis-properties:/var/lib/openelis-global/properties
       - ./openelis/volume/configuration:/var/lib/openelis-global/configuration
       - ./openelis/volume/plugins:/var/lib/openelis-global/plugins
       - ./openelis/volume/ocl:/var/lib/openelis-global/ocl

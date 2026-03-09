@@ -45,18 +45,6 @@ COPY --from=dev /openmrs/distribution/openmrs_modules /openmrs/distribution/open
 COPY --from=dev /openmrs/distribution/openmrs_owas /openmrs/distribution/openmrs_owas
 COPY --from=dev /openmrs/distribution/openmrs_config /openmrs/distribution/openmrs_config
 
-# ── Nidan customisations ──────────────────────────────────────────────────────
-# All filesystem operations run as root (openmrs user may not exist in this image)
-USER root
-RUN rm -f /openmrs/distribution/openmrs_modules/attachments-*.omod && \
-    rm -f /openmrs/distribution/openmrs_modules/appointments-*.omod && \
-    rm -f /openmrs/distribution/openmrs_modules/fhir2-*.omod && \
-    rm -f /openmrs/distribution/openmrs_modules/patientdocuments-*.omod && \
-    rm -f /openmrs/distribution/openmrs_modules/stockmanagement-*.omod && \
-    rm -f /openmrs/distribution/openmrs_modules/billing-*.omod && \
-    rm -f /openmrs/distribution/openmrs_modules/referencedemodata-*.omod && \
-    mkdir -p /openmrs/distribution/ocl/loadAtStartup
-
 # Copy custom SNAPSHOT modules (attachments, appointments, fhir2, bahmni-ipd,
 # medication-administration, orderexpansion — see custom_modules/README)
 COPY custom_modules/ /openmrs/distribution/openmrs_modules/
