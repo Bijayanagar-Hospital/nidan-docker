@@ -155,7 +155,7 @@ services:
     build: ./odoo
     image: nidan/odoo:19
     container_name: nidan-odoo
-    command: sh -c "odoo -d \${ODOO_DB_NAME:-nidan} -u all"
+    command: sh -c "odoo -d \${ODOO_DB_NAME:-nidan} --proxy-mode -u all"
     ports:
       - "8069:8069"
     environment:
