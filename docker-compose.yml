@@ -154,7 +154,7 @@ services:
   # ============================================================================
   odoo:
     build: ./odoo
-    image: nidan/odoo:19
+    image: trigonaltechnology/nidan_odoo:latest
     container_name: nidan-odoo
     command: sh -c "odoo -d \${ODOO_DB_NAME:-nidan} --proxy-mode -u all"
     ports:
