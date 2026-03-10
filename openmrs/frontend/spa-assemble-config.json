@@ -45,7 +45,8 @@
     "@openmrs/esm-service-queues-app": "next",
     "@openmrs/esm-system-admin-app": "next",
     "@openmrs/esm-user-onboarding-app": "next",
-    "@openmrs/esm-ward-app": "next"
+    "@openmrs/esm-ward-app": "next",
+    "@trigonal/esm-ipd-app": "trigonal-esm-ipd-app-1.0.0.tgz"
   },
   "excludedFrontendModules": []
 }

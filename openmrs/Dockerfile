@@ -1,10 +1,12 @@
 # syntax=docker/dockerfile:1
 
-### Clone content repo (base image has no apt/yum; use alpine for git)
+### Clone content repo (base image has no git; use alpine)
 FROM alpine:3.19 AS content-clone
 ARG CONTENT_REPO_URL="https://github.com/Trigonal-Technology/openmrs-content-referenceapplication-demo.git"
 ARG CONTENT_REPO_REF="main"
+ARG CACHE_BUST
 RUN apk add --no-cache git && \
+    echo "CACHE_BUST=${CACHE_BUST}" >/dev/null && \
     git clone --depth 1 --branch "${CONTENT_REPO_REF}" "${CONTENT_REPO_URL}" /content
 
 ### Dev Stage
@@ -19,16 +21,31 @@ ARG OMRS_PROFILE="no-demo"
 ARG MVN_ARGS_SETTINGS="-s /usr/share/maven/ref/settings-docker.xml -B -U -P distro"
 ARG CONTENT_VERSION="1.8.0-nidan-SNAPSHOT"
 
-# Copy build files
+# Copy build files (paths relative to build context = ./openmrs)
 COPY pom.xml ./
 COPY distro ./distro/
+COPY custom_modules /openmrs_distro/custom_modules/
+
+# Install custom OMODs to local Maven repo so distro build can resolve them (ensures correct module load order)
+# Use same local repo path as distro build (settings-docker.xml uses /usr/share/maven/ref/repository)
+RUN set -e; \
+    mkdir -p /usr/share/maven/ref/repository && \
+    for f in /openmrs_distro/custom_modules/medication-administration-*.omod; do \
+      [ -f "$$f" ] && mvn install:install-file -Dfile="$$f" -DgroupId=org.bahmni.module \
+        -DartifactId=medication-administration-omod -Dversion=2.0.0-SNAPSHOT -Dpackaging=jar \
+        -Dmaven.repo.local=/usr/share/maven/ref/repository -q; break; \
+    done; \
+    for f in /openmrs_distro/custom_modules/bahmni-ipd-*.omod; do \
+      [ -f "$$f" ] && mvn install:install-file -Dfile="$$f" -DgroupId=org.bahmni.module \
+        -DartifactId=bahmni-ipd-omod -Dversion=1.2.0-20240913.162939-1 -Dpackaging=jar \
+        -Dmaven.repo.local=/usr/share/maven/ref/repository -q; break; \
+    done
 
 # Copy cloned content from content-clone stage
 COPY --from=content-clone /content /tmp/openmrs-content-referenceapplication-demo
 
 ARG CACHE_BUST
 # Build content + distro in ONE RUN with same Maven settings so both use same local repo.
-# The distro build could not find the content package when they ran in separate RUNs
 # (content used default ~/.m2, distro used settings-docker.xml's localRepository).
 RUN --mount=type=secret,id=m2settings,target=/usr/share/maven/ref/settings-docker.xml \
     mkdir -p /root/.m2 && echo "statsEnabled=false" > /root/.m2/sdk-stats.properties && \
@@ -71,4 +88,3 @@ COPY custom_modules/ /openmrs/distribution/openmrs_modules/
 # Copy Nidan PostgreSQL Dialect jar into Tomcat shared lib
 # (startup-custom.sh also injects it into the WAR's WEB-INF/lib for safety)
 COPY nidan-dialect.jar /usr/local/tomcat/lib/nidan-dialect.jar
-

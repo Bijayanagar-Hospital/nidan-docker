@@ -4,3 +4,7 @@
 -- Optional: enable extensions if needed by OpenMRS modules
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "pg_trgm";
+
+-- Hibernate uses this sequence for ID generation on PostgreSQL
+-- Required by Initializer module when loading metadata
+CREATE SEQUENCE IF NOT EXISTS hibernate_sequence;

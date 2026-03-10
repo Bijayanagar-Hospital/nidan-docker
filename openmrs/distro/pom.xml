@@ -57,6 +57,8 @@
         <emrapi.version>3.2.1</emrapi.version>
         <event.version>4.0.0</event.version>
         <bedmanagement.version>7.2.0</bedmanagement.version>
+        <medication-administration.version>2.0.0-SNAPSHOT</medication-administration.version>
+        <bahmni-ipd.version>1.2.0-SNAPSHOT</bahmni-ipd.version>
         <!-- Stock Management and Billing - tracked for reference; excluded from no-demo build -->
         <stockmanagement.version>3.0.0</stockmanagement.version>
         <billing.version>2.2.0-SNAPSHOT</billing.version>
@@ -242,6 +244,19 @@
             <groupId>org.openmrs.module</groupId>
             <artifactId>bedmanagement-omod</artifactId>
             <version>${bedmanagement.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- medication-administration and bahmni-ipd from custom_modules/ - installed to local repo during Docker build -->
+        <dependency>
+            <groupId>org.bahmni.module</groupId>
+            <artifactId>medication-administration-omod</artifactId>
+            <version>${medication-administration.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.bahmni.module</groupId>
+            <artifactId>bahmni-ipd-omod</artifactId>
+            <version>${bahmni-ipd.version}</version>
             <scope>provided</scope>
         </dependency>
         <!-- stockmanagement is DISABLED for NidanEHR -->
