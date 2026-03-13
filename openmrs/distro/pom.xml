@@ -246,19 +246,14 @@
             <version>${bedmanagement.version}</version>
             <scope>provided</scope>
         </dependency>
-        <!-- medication-administration and bahmni-ipd from custom_modules/ - installed to local repo during Docker build -->
+        <!-- medication-administration from custom_modules/ - installed to local repo during Docker build -->
         <dependency>
             <groupId>org.bahmni.module</groupId>
             <artifactId>medication-administration-omod</artifactId>
             <version>${medication-administration.version}</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.bahmni.module</groupId>
-            <artifactId>bahmni-ipd-omod</artifactId>
-            <version>${bahmni-ipd.version}</version>
-            <scope>provided</scope>
-        </dependency>
+        <!-- bahmni-ipd excluded from distro build (not in remote repo); provided by custom_modules/ at runtime -->
         <!-- stockmanagement is DISABLED for NidanEHR -->
         <!--
         <dependency>

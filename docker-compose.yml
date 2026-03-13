@@ -90,6 +90,9 @@ services:
       - openmrs-data:/openmrs/data
       - ./openmrs/nidan-dialect.jar:/tmp/nidan-dialect.jar:ro
       - ./openmrs/startup-custom.sh:/openmrs/startup.sh:ro
+      # Uncomment to use local config for Initializer debugging (path relative to nidan-docker; adjust if layout differs).
+      # Mount at distribution so startup-init copies it to /openmrs/data/configuration:
+      # - ../openmrs-backend/openmrs-content-referenceapplication-demo/configuration:/openmrs/distribution/openmrs_config:ro
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8080/openmrs/" ]
       interval: 30s
@@ -172,6 +175,8 @@ services:
       - ODOO_DB_FILTER=^${ODOO_DB_NAME:-nidan}$
     volumes:
       - odoo-data:/var/lib/odoo
+      # Bind-mount addons for live sync (set ODOO_ADDONS_PATH in .env to absolute path)
+      - ${ODOO_ADDONS_PATH:-../odoo_19_addons}:/mnt/extra-addons
       # odoo.conf from git (read-only). Entrypoint copies to container; runtime changes stay in container.
       - ./odoo/odoo.conf:/mnt/odoo.conf.template:ro
     networks:

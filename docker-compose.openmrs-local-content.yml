@@ -1,0 +1,14 @@
+# Override to build OpenMRS with LOCAL content (openmrs-backend/openmrs-content-referenceapplication-demo)
+# instead of cloning from git. Use when debugging Initializer metadata loading.
+#
+# Usage (from nidan-docker directory):
+#   docker-compose -f docker-compose.yml -f docker-compose.openmrs-local-content.yml build openmrs-backend
+#   docker-compose -f docker-compose.yml -f docker-compose.openmrs-local-content.yml up -d openmrs-backend
+#
+# Requires: openmrs-backend and nidan-docker are siblings under same repo root
+
+services:
+  openmrs-backend:
+    build:
+      context: ..
+      dockerfile: openmrs/Dockerfile.local-content
