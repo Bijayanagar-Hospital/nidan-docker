@@ -27,7 +27,7 @@
         <openmrs.version>2.8.4</openmrs.version>
         <initializer.version>2.11.0</initializer.version>
         <!-- fhir2 provided by custom_modules/ (SNAPSHOT build) -->
-        <fhir2.version>3.0.0</fhir2.version>
+        <fhir2.version>3.1.0-nidan-SNAPSHOT</fhir2.version>
         <webservices.rest.version>3.2.0</webservices.rest.version>
         <addresshierarchy.version>2.21.0</addresshierarchy.version>
         <patientdocuments.version>1.0.0</patientdocuments.version>
@@ -35,14 +35,16 @@
         <legacyui.version>2.0.0</legacyui.version>
         <metadatamapping.version>2.0.0</metadatamapping.version>
         <openconceptlab.version>3.0.0</openconceptlab.version>
-        <!-- attachments provided by custom_modules/ -->
-        <attachments.version>4.0.0</attachments.version>
+        <!-- attachments provided by custom_modules/ (Nidan SNAPSHOT) -->
+        <attachments.version>4.1.0-nidan-SNAPSHOT</attachments.version>
         <!-- referencedemodata kept for version tracking only; excluded from no-demo build -->
         <referencedemodata.version>2.6.1</referencedemodata.version>
         <queue.version>3.0.0</queue.version>
-        <!-- appointments provided by custom_modules/ (Bahmni SNAPSHOT) -->
-        <!-- <appointments.version>2.1.0-20250318.070530-1</appointments.version> -->
+        <!-- appointments provided by custom_modules/ (Nidan SNAPSHOT) -->
+        <appointments.version>2.1.0-nidan-SNAPSHOT</appointments.version>
         <teleconsultation.version>2.1.0-20250318.154145-1</teleconsultation.version>
+        <!-- communication provided by custom_modules/ (Nidan SNAPSHOT) -->
+        <communication.version>1.3.0-nidan-SNAPSHOT</communication.version>
         <cohort.version>3.7.3</cohort.version>
         <authentication.version>2.2.0</authentication.version>
         <reporting.version>2.1.0</reporting.version>
@@ -52,6 +54,8 @@
         <htmlwidgets.version>2.0.1</htmlwidgets.version>
         <serialization-xstream.version>0.3.0</serialization-xstream.version>
         <ordertemplates.version>2.2.0</ordertemplates.version>
+        <!-- orderexpansion provided by custom_modules/ (Nidan SNAPSHOT) -->
+        <orderexpansion.version>1.0.1-nidan-SNAPSHOT</orderexpansion.version>
         <patientflags.version>3.0.10</patientflags.version>
         <o3forms.version>2.3.0</o3forms.version>
         <emrapi.version>3.2.1</emrapi.version>
@@ -186,6 +190,15 @@
             <version>${cohort.version}</version>
             <scope>provided</scope>
         </dependency>
+        <!-- communication provided by custom_modules/ (Nidan SNAPSHOT) — comment out to avoid version conflict -->
+        <!--
+        <dependency>
+            <groupId>org.openmrs.module</groupId>
+            <artifactId>communication-omod</artifactId>
+            <version>${communication.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        -->
         <dependency>
             <groupId>org.openmrs.module</groupId>
             <artifactId>reporting-omod</artifactId>
@@ -278,6 +291,15 @@
             <version>${ordertemplates.version}</version>
             <scope>provided</scope>
         </dependency>
+        <!-- orderexpansion provided by custom_modules/ (Nidan SNAPSHOT) — comment out to avoid version conflict -->
+        <!--
+        <dependency>
+            <groupId>org.openmrs.module</groupId>
+            <artifactId>orderexpansion-omod</artifactId>
+            <version>${orderexpansion.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        -->
     </dependencies>
 
     <build>
