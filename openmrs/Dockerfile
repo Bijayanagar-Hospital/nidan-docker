@@ -81,5 +81,4 @@ COPY custom_modules/ /openmrs/distribution/openmrs_modules/
 COPY properties/ /openmrs/distribution/openmrs_properties/
 
 # Diagnostic script for Initializer troubleshooting
-COPY check-initializer.sh /openmrs/check-initializer.sh
-RUN chmod +x /openmrs/check-initializer.sh
+COPY --chmod=755 check-initializer.sh /openmrs/check-initializer.sh
