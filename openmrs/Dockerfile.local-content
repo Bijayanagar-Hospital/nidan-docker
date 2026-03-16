@@ -1,0 +1,70 @@
+# syntax=docker/dockerfile:1
+#
+# Same as Dockerfile but uses LOCAL openmrs-content-referenceapplication-demo
+# (includes PostgreSQL liquibase fixes in configuration/liquibase/liquibase.xml)
+#
+# Use with: docker-compose -f docker-compose.yml -f docker-compose.openmrs-local-content.yml build openmrs-backend
+# Build context MUST be repo root (parent of nidan-docker).
+
+### Dev stage (build) - no content-clone; use local content
+FROM openmrs/openmrs-core:2.8.x-dev-amazoncorretto-21 AS dev
+WORKDIR /openmrs_distro
+
+ARG OMRS_PROFILE="distro"
+ARG MVN_ARGS_SETTINGS="-B -P distro"
+ARG CONTENT_VERSION="1.8.0-nidan-SNAPSHOT"
+ARG CACHE_BUST
+
+# Copy build files from nidan-docker/openmrs
+COPY nidan-docker/openmrs/pom.xml ./
+COPY nidan-docker/openmrs/distro ./distro/
+COPY nidan-docker/openmrs/custom_modules /openmrs_distro/custom_modules/
+COPY nidan-docker/openmrs/nidan-dialect /openmrs_distro/nidan-dialect/
+
+# Copy LOCAL content (includes liquibase fixes)
+COPY openmrs-backend/openmrs-content-referenceapplication-demo /tmp/openmrs-content-referenceapplication-demo
+
+# Build: install custom OMODs → build content → build distro → copy artifacts
+# --mount=type=cache: Maven .m2 cache persists between builds (requires DOCKER_BUILDKIT=1)
+# -T 1C: parallel Maven (1 thread per CPU core)
+RUN --mount=type=cache,target=/root/.m2 \
+    mkdir -p /root/.m2 && \
+    echo "statsEnabled=false" > /root/.m2/sdk-stats.properties && \
+    echo "statsEnabled=false" > sdk-stats.properties && \
+    echo "CACHE_BUST=${CACHE_BUST}" >/dev/null && \
+    \
+    for f in /openmrs_distro/custom_modules/medication-administration-*.omod; do \
+      [ -f "$$f" ] && mvn install:install-file -Dfile="$$f" \
+        -DgroupId=org.bahmni.module -DartifactId=medication-administration-omod \
+        -Dversion=2.0.0-SNAPSHOT -Dpackaging=jar -q; break; \
+    done && \
+    mvn -f /openmrs_distro/nidan-dialect/pom.xml package -DskipTests -q && \
+    \
+    sed -i "s|<version>1.8.0-SNAPSHOT</version>|<version>${CONTENT_VERSION}</version>|" /tmp/openmrs-content-referenceapplication-demo/pom.xml && \
+    mvn $MVN_ARGS_SETTINGS -T 1C -f /tmp/openmrs-content-referenceapplication-demo/pom.xml install -DskipTests -q && \
+    \
+    sed -i "s|<reference-demo-content.version>.*</reference-demo-content.version>|<reference-demo-content.version>${CONTENT_VERSION}</reference-demo-content.version>|" distro/pom.xml && \
+    mvn $MVN_ARGS_SETTINGS -T 1C clean install -Dmaven.deploy.skip=true && \
+    \
+    cp /openmrs_distro/distro/target/sdk-distro/web/openmrs_core/openmrs.war /openmrs/distribution/openmrs_core/ && \
+    (mkdir -p /tmp/war-add/WEB-INF/lib && cp /openmrs_distro/nidan-dialect/target/nidan-dialect-1.0.0.jar /tmp/war-add/WEB-INF/lib/ && cd /tmp/war-add && jar uf /openmrs/distribution/openmrs_core/openmrs.war WEB-INF/lib/nidan-dialect-1.0.0.jar) && \
+    cp /openmrs_distro/distro/target/sdk-distro/web/openmrs-distro.properties /openmrs/distribution/ && \
+    cp -R /openmrs_distro/distro/target/sdk-distro/web/openmrs_modules /openmrs/distribution/openmrs_modules/ && \
+    cp -R /openmrs_distro/distro/target/sdk-distro/web/openmrs_owas /openmrs/distribution/openmrs_owas/ && \
+    cp -R /openmrs_distro/distro/target/sdk-distro/web/openmrs_config /openmrs/distribution/openmrs_config/ && \
+    cp -R /tmp/openmrs-content-referenceapplication-demo/configuration/* /openmrs/distribution/openmrs_config/ && \
+    rm -rf /tmp/openmrs-content-referenceapplication-demo && \
+    \
+    mvn $MVN_ARGS_SETTINGS -T 1C clean
+
+### Run stage (production)
+FROM openmrs/openmrs-core:2.8.x-amazoncorretto-21
+
+# Copy built artifacts (nidan-dialect JAR is embedded in openmrs.war WEB-INF/lib)
+COPY --from=dev /openmrs/distribution/openmrs_core/openmrs.war /openmrs/distribution/openmrs_core/
+COPY --from=dev /openmrs/distribution/openmrs-distro.properties /openmrs/distribution/
+COPY --from=dev /openmrs/distribution/openmrs_modules /openmrs/distribution/openmrs_modules
+COPY --from=dev /openmrs/distribution/openmrs_owas /openmrs/distribution/openmrs_owas
+COPY --from=dev /openmrs/distribution/openmrs_config /openmrs/distribution/openmrs_config
+
+COPY nidan-docker/openmrs/custom_modules/ /openmrs/distribution/openmrs_modules/

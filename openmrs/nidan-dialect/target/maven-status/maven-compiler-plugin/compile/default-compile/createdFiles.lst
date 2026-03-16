@@ -1,0 +1,3 @@
+com/nidan/dialect/StringClobType.class
+com/nidan/dialect/NidanPostgreSQLDialect.class
+com/nidan/dialect/ClobToTextTypeContributor.class

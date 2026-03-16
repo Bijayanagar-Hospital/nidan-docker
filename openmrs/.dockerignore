@@ -1,0 +1,14 @@
+# Build outputs (rebuilt in container)
+distro/target
+frontend/spa
+
+# Git and IDE
+.git
+.gitignore
+*.md
+!custom_modules/README.md
+
+# Documentation (excluded from build context)
+PRODUCTION-BUILD-PLAN.md
+POSTGRESQL-TROUBLESHOOTING.md
+scripts/
