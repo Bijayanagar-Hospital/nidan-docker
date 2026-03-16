@@ -89,6 +89,8 @@ cd ../openmrs-module-appointments && mvn package -DskipTests && cp omod/target/*
 
 **Custom modules**: attachments, appointments, communication, fhir2, bahmni-ipd, medication-administration, orderexpansion.
 
+**Local-first Maven**: POMs use `updatePolicy=never` for snapshot repos so `~/.m2/repository` is preferred. Build order: `fhir2` → `medication-administration` → `ipd`. Optional: `mvn -s openmrs-backend/settings-local-first.xml ...`.
+
 ### 3.3 Distro Modules (`distro/distro-no-demo.properties`)
 
 - initializer, fhir2, webservices.rest, idgen, legacyui, addresshierarchy, patientdocuments, metadatamapping, openconceptlab

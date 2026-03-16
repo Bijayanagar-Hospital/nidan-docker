@@ -76,3 +76,10 @@ COPY --from=dev /openmrs/distribution/openmrs_config /openmrs/distribution/openm
 
 # Overlay custom modules (bahmni-ipd, attachments, appointments, etc. — runtime-only or not in distro)
 COPY custom_modules/ /openmrs/distribution/openmrs_modules/
+
+# Property files for modules (appointment.properties, etc.) — copied to data dir at startup
+COPY properties/ /openmrs/distribution/openmrs_properties/
+
+# Diagnostic script for Initializer troubleshooting
+COPY check-initializer.sh /openmrs/check-initializer.sh
+RUN chmod +x /openmrs/check-initializer.sh

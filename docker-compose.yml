@@ -5,7 +5,7 @@ networks:
 volumes:
   openmrs-data:
   openmrs-db-data:
-  openmrs-db-postgres-data:
+  # openmrs-db-postgres-data:  # commented - PostgreSQL for OpenMRS disabled for now
   odoo-data:
   odoo-db-data:
   orthanc-data:
@@ -72,7 +72,7 @@ services:
       OMRS_DB: mysql
       OMRS_DB_HOSTNAME: openmrs-db
       OMRS_DB_PORT: "3306"
-      OMRS_DB_URL: jdbc:mysql://openmrs-db:3306/${OPENMRS_DB_NAME:-openmrs}?autoReconnect=true&useUnicode=true&characterEncoding=UTF-8&sessionVariables=storage_engine=InnoDB
+      OMRS_DB_URL: jdbc:mysql://openmrs-db:3306/${OPENMRS_DB_NAME:-openmrs}?useUnicode=true&characterEncoding=UTF-8&sessionVariables=storage_engine=InnoDB
       OMRS_DB_USERNAME: ${OPENMRS_DB_USER:-openmrs}
       OMRS_DB_PASSWORD: ${OPENMRS_DB_PASSWORD:-openmrs}
       OMRS_DB_DRIVER_CLASS: com.mysql.cj.jdbc.Driver
@@ -145,30 +145,30 @@ services:
     networks:
       - nidan-network
 
-  # PostgreSQL for OpenMRS (kept for future/fallback; not used when MySQL is active)
-  openmrs-db-postgres:
-    image: postgres:15-alpine
-    container_name: nidan-openmrs-db-postgres
-    profiles:
-      - openmrs-postgres
-    command: >
-      postgres -c wal_level=logical -c max_slot_wal_keep_size=${POSTGRES_MAX_SLOT_WAL_KEEP_SIZE:-1GB}
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${OPENMRS_DB_USER:-openmrs} -d ${OPENMRS_DB_NAME:-openmrs}" ]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    ports:
-      - "5433:5432"
-    environment:
-      POSTGRES_DB: ${OPENMRS_DB_NAME:-openmrs}
-      POSTGRES_USER: ${OPENMRS_DB_USER:-openmrs}
-      POSTGRES_PASSWORD: ${OPENMRS_DB_PASSWORD:-openmrs}
-    volumes:
-      - openmrs-db-postgres-data:/var/lib/postgresql/data
-      - ./openmrs-db/init-openmrs-db.sql:/docker-entrypoint-initdb.d/init-openmrs-db.sql:ro
-    networks:
-      - nidan-network
+  # PostgreSQL for OpenMRS - commented out for now
+  # openmrs-db-postgres:
+  #   image: postgres:15-alpine
+  #   container_name: nidan-openmrs-db-postgres
+  #   profiles:
+  #     - openmrs-postgres
+  #   command: >
+  #     postgres -c wal_level=logical -c max_slot_wal_keep_size=${POSTGRES_MAX_SLOT_WAL_KEEP_SIZE:-1GB}
+  #   healthcheck:
+  #     test: [ "CMD-SHELL", "pg_isready -U ${OPENMRS_DB_USER:-openmrs} -d ${OPENMRS_DB_NAME:-openmrs}" ]
+  #     interval: 5s
+  #     timeout: 5s
+  #     retries: 5
+  #   ports:
+  #     - "5433:5432"
+  #   environment:
+  #     POSTGRES_DB: ${OPENMRS_DB_NAME:-openmrs}
+  #     POSTGRES_USER: ${OPENMRS_DB_USER:-openmrs}
+  #     POSTGRES_PASSWORD: ${OPENMRS_DB_PASSWORD:-openmrs}
+  #   volumes:
+  #     - openmrs-db-postgres-data:/var/lib/postgresql/data
+  #     - ./openmrs-db/init-openmrs-db.sql:/docker-entrypoint-initdb.d/init-openmrs-db.sql:ro
+  #   networks:
+  #     - nidan-network
 
   # ============================================================================
   # ODOO

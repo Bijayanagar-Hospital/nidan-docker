@@ -3,6 +3,21 @@
 
 source /openmrs/startup-init.sh
 
+DATA_DIR="${OMRS_DATA_DIR:-/openmrs/data}"
+mkdir -p "$DATA_DIR"
+
+# Ensure Initializer configuration exists (required for metadata loading)
+if [ -d /openmrs/distribution/openmrs_config ]; then
+  echo "Ensuring Initializer configuration at $DATA_DIR/configuration"
+  rm -rf "$DATA_DIR/configuration"
+  cp -R /openmrs/distribution/openmrs_config "$DATA_DIR/configuration"
+fi
+
+# Copy property files to data dir (appointment.properties, etc.)
+if [ -d /openmrs/distribution/openmrs_properties ]; then
+  cp -n /openmrs/distribution/openmrs_properties/* "$DATA_DIR/" 2>/dev/null || true
+fi
+
 echo "Waiting for database to initialize..."
 
 /openmrs/wait-for-it.sh -t 3600 -h "${OMRS_DB_HOSTNAME}" -p "${OMRS_DB_PORT}"
@@ -72,8 +87,10 @@ if [ -f "${OMRS_RUNTIME_PROPERTIES_FILE}" ]; then
         url="${url}?stringtype=unspecified"
       fi
     fi
+    # Escape & for sed replacement (sed treats & as "matched text" placeholder)
+    url_sed="${url//&/\\&}"
     if grep -q '^connection\.url=' "${OMRS_RUNTIME_PROPERTIES_FILE}"; then
-      sed -i "s|^connection\.url=.*|connection.url=${url}|" "${OMRS_RUNTIME_PROPERTIES_FILE}"
+      sed -i "s|^connection\.url=.*|connection.url=${url_sed}|" "${OMRS_RUNTIME_PROPERTIES_FILE}"
     else
       echo "connection.url=${url}" >> "${OMRS_RUNTIME_PROPERTIES_FILE}"
     fi
@@ -107,10 +124,17 @@ echo "Starting up OpenMRS..."
 
 /usr/local/tomcat/bin/catalina.sh run &
 
-# Trigger first filter to start data import
-sleep 15
-curl -sL "http://localhost:8080/${OMRS_WEBAPP_NAME}/" > /dev/null || true
-sleep 15
+# Trigger first filter to start data import (Initializer runs on first request)
+echo "Waiting for Tomcat to initialize (60s)..."
+sleep 60
+for i in 1 2 3 4 5 6 7 8 9 10; do
+  if curl -sf "http://localhost:8080/${OMRS_WEBAPP_NAME}/" > /dev/null; then
+    echo "OpenMRS responded; Initializer will load metadata."
+    break
+  fi
+  echo "Attempt $i/10: waiting 15s..."
+  sleep 15
+done
 
 # Bring tomcat process to foreground again
 wait ${!}

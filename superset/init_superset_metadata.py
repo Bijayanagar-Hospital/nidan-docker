@@ -30,8 +30,9 @@ def main():
 
     app = create_app()
 
+    openmrs_db_type = os.environ.get("OPENMRS_DB_TYPE", "mysql")
     DB_CONFIGS = {
-        "openmrs": {"name": "OpenMRS", "uri": get_db_uri("OPENMRS_DB", "openmrs-db", "mysql")},
+        "openmrs": {"name": "OpenMRS", "uri": get_db_uri("OPENMRS_DB", "openmrs-db", openmrs_db_type)},
         "openelis": {"name": "OpenELIS", "uri": get_db_uri("OPENELIS_DB", "openelis-db")},
         "odoo": {"name": "Odoo", "uri": get_db_uri("ODOO_DB", "odoo-db")},
     }

@@ -141,6 +141,8 @@
       <url>https://mavenrepo.openmrs.org/snapshots</url>
       <snapshots>
         <enabled>true</enabled>
+        <!-- Prefer local .m2 for nidan SNAPSHOTs; avoid remote lookup until Maven account is set up -->
+        <updatePolicy>never</updatePolicy>
       </snapshots>
       <releases>
         <enabled>false</enabled>
@@ -155,6 +157,7 @@
       <url>https://nexus.mekomsolutions.net/repository/maven-snapshots/</url>
       <snapshots>
         <enabled>true</enabled>
+        <updatePolicy>never</updatePolicy>
       </snapshots>
     </repository>
     <repository>
@@ -166,7 +169,7 @@
       </releases>
       <snapshots>
         <enabled>true</enabled>
-        <updatePolicy>interval:10080</updatePolicy>
+        <updatePolicy>never</updatePolicy>
       </snapshots>
     </repository>
   </repositories>

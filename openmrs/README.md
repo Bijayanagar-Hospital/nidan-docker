@@ -27,6 +27,8 @@ docker-compose build openmrs-backend
 docker-compose up -d openmrs-backend
 ```
 
+**Local-first Maven**: POMs use `updatePolicy=never` for snapshot repos so `~/.m2/repository` is preferred over remote. Build custom modules in order: `fhir2` → `medication-administration` → `ipd`. Optional: `mvn -s openmrs-backend/settings-local-first.xml ...`.
+
 **If Maven dependency resolution fails** (e.g. `openmrs.jfrog.io:443 failed to respond`):
 - Retry the build (OpenMRS Maven repo can have transient issues)
 - Try with host network: `docker build --network=host -f openmrs/Dockerfile ./openmrs`
@@ -108,9 +110,30 @@ Requires: `openmrs-backend` and `nidan-docker` as siblings under the same repo r
 
 ## 6. Troubleshooting: Metadata / Initializer Not Loading
 
-If OpenMRS starts but **no concepts, locations, or other metadata** appear:
+If OpenMRS starts but **no concepts, locations, or other metadata** appear, or it gets stuck during data insertion:
 
-### PostgreSQL "Bad value for type long"
+### 1. Run diagnostic (inside container)
+
+```bash
+docker exec -it nidan-openmrs-backend /openmrs/check-initializer.sh
+```
+
+Verifies that `configuration/` exists in the data dir and has files.
+
+### 2. Fresh start (nuclear option)
+
+Corrupted volume state can block Initializer. Do a full reset:
+
+```bash
+docker-compose down
+docker volume rm nidan-docker_openmrs-data 2>/dev/null || true
+docker-compose build --no-cache openmrs-backend
+docker-compose up -d openmrs-backend
+```
+
+Then tail logs: `docker logs -f nidan-openmrs-backend` and wait for "OpenMRS config loading process completed" from Initializer.
+
+### 3. PostgreSQL "Bad value for type long"
 
 Use the local content build (above) so the liquibase fixes in the content repo are included. Then do a **fresh database**:
 
@@ -119,6 +142,6 @@ docker-compose down -v
 docker-compose -f docker-compose.yml -f docker-compose.openmrs-local-content.yml up -d openmrs-backend
 ```
 
-### Configuration volume
+### 4. Configuration volume
 
 The `./configuration:/openmrs/data/configuration` mount is **commented out** by default. Config comes from the baked-in image.
