@@ -71,7 +71,7 @@ nidanhis/
 2. **dev** (openmrs/openmrs-core:2.8.x-dev-amazoncorretto-21):
    - Builds content package (`mvn install`), then distro (`mvn clean install -P no-demo`)
    - Copies WAR, modules, OWAs, config to `/openmrs/distribution/`
-3. **Run stage**: Copies artifacts + **custom_modules/** + **nidan-dialect.jar**
+3. **Run stage**: Copies artifacts + **custom_modules/**
 
 **Build profile**: `no-demo` (excludes referencedemodata, stockmanagement, billing). Use `OMRS_PROFILE=distro` for full demo.
 
@@ -101,9 +101,8 @@ cd ../openmrs-module-appointments && mvn package -DskipTests && cp omod/target/*
 
 - **openmrs-db**: PostgreSQL 15 Alpine
 - **Init script**: `openmrs-db/init-openmrs-db.sql` – uuid-ossp, pg_trgm, hibernate_sequence
-- **Dialect**: `NidanPostgreSQLDialect` (nidan-dialect.jar) – LOB/CLOB mapping for PostgreSQL
 - **JDBC URL**: `jdbc:postgresql://openmrs-db:5432/openmrs?stringtype=unspecified`
-- **Startup**: `startup-custom.sh` injects nidan-dialect.jar into WAR WEB-INF/lib and updates runtime properties (dialect, connection.url)
+- **Startup**: `startup-custom.sh` patches runtime properties (connection.url with `stringtype=unspecified`) for PostgreSQL
 
 ### 3.5 PostgreSQL-Specific Fixes
 
@@ -255,7 +254,6 @@ docker-compose up -d
 | OpenMRS distro props | nidan-docker/openmrs/distro/distro-no-demo.properties |
 | Custom modules dir | nidan-docker/openmrs/custom_modules/ |
 | OpenMRS DB init | nidan-docker/openmrs-db/init-openmrs-db.sql |
-| Nidan dialect | nidan-docker/openmrs/nidan-dialect.jar |
 | Appointments Liquibase | openmrs-backend/openmrs-module-appointments/api/src/main/resources/liquibase.xml |
 | Odoo addons (dev) | dev.docker-compose.yml mounts ODOO_EXTRA_ADDONS_HOST_PATH → /mnt/extra-addons |
 | OpenELIS config | nidan-docker/openelis/volume/ |

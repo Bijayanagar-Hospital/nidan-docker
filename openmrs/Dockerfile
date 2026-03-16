@@ -1,6 +1,12 @@
 # syntax=docker/dockerfile:1
-
-### Clone content repo (base image has no git; use alpine)
+#
+# Nidan OpenMRS Production Build (Option B)
+# Full custom build from source: distro/ controls modules, custom_modules/ provides Nidan OMODs.
+#
+# Build: docker-compose build openmrs-backend
+# Prerequisites: Populate custom_modules/ with .omod files (see custom_modules/README.md)
+#
+### Content clone stage
 FROM alpine:3.19 AS content-clone
 ARG CONTENT_REPO_URL="https://github.com/Trigonal-Technology/openmrs-content-referenceapplication-demo.git"
 ARG CONTENT_REPO_REF="main"
@@ -9,76 +15,64 @@ RUN apk add --no-cache git && \
     echo "CACHE_BUST=${CACHE_BUST}" >/dev/null && \
     git clone --depth 1 --branch "${CONTENT_REPO_REF}" "${CONTENT_REPO_URL}" /content
 
-### Dev Stage
+### Dev stage (build)
 FROM openmrs/openmrs-core:2.8.x-dev-amazoncorretto-21 AS dev
 WORKDIR /openmrs_distro
 
-# Build profile switch:
-#   no-demo (default/production) — excludes referencedemodata, stockmanagement, billing
-#   distro  (with demo data)     — full demo stack
-# Override at build time: docker-compose build --build-arg OMRS_PROFILE=distro openmrs-backend
-ARG OMRS_PROFILE="no-demo"
-ARG MVN_ARGS_SETTINGS="-s /usr/share/maven/ref/settings-docker.xml -B -P distro"
+ARG OMRS_PROFILE="distro"
+ARG MVN_ARGS_SETTINGS="-B -P distro"
 ARG CONTENT_VERSION="1.8.0-nidan-SNAPSHOT"
+ARG CACHE_BUST
 
-# Copy build files (paths relative to build context = ./openmrs)
+# Copy build files
 COPY pom.xml ./
 COPY distro ./distro/
 COPY custom_modules /openmrs_distro/custom_modules/
+COPY nidan-dialect /openmrs_distro/nidan-dialect/
 
-# Copy cloned content from content-clone stage
+# Copy cloned content
 COPY --from=content-clone /content /tmp/openmrs-content-referenceapplication-demo
 
-ARG CACHE_BUST
-# Build content + distro in ONE RUN; use default ~/.m2/repository so install and build share same repo.
-RUN --mount=type=secret,id=m2settings,target=/usr/share/maven/ref/settings-docker.xml \
+# Build: install custom OMODs → build content → build distro → copy artifacts → overlay config
+RUN \
     mkdir -p /root/.m2 && \
     echo "statsEnabled=false" > /root/.m2/sdk-stats.properties && \
     echo "statsEnabled=false" > sdk-stats.properties && \
+    echo "CACHE_BUST=${CACHE_BUST}" >/dev/null && \
+    \
     for f in /openmrs_distro/custom_modules/medication-administration-*.omod; do \
-      [ -f "$$f" ] && mvn -s /usr/share/maven/ref/settings-docker.xml install:install-file -Dfile="$$f" -DgroupId=org.bahmni.module \
-        -DartifactId=medication-administration-omod -Dversion=2.0.0-SNAPSHOT -Dpackaging=jar -q; break; \
+      [ -f "$$f" ] && mvn install:install-file -Dfile="$$f" \
+        -DgroupId=org.bahmni.module -DartifactId=medication-administration-omod \
+        -Dversion=2.0.0-SNAPSHOT -Dpackaging=jar -q; break; \
     done && \
+    mvn -f /openmrs_distro/nidan-dialect/pom.xml package -DskipTests -q && \
+    \
     sed -i "s|<version>1.8.0-SNAPSHOT</version>|<version>${CONTENT_VERSION}</version>|" /tmp/openmrs-content-referenceapplication-demo/pom.xml && \
     mvn $MVN_ARGS_SETTINGS -f /tmp/openmrs-content-referenceapplication-demo/pom.xml install -DskipTests -q && \
-    rm -rf /tmp/openmrs-content-referenceapplication-demo && \
+    \
     sed -i "s|<reference-demo-content.version>.*</reference-demo-content.version>|<reference-demo-content.version>${CONTENT_VERSION}</reference-demo-content.version>|" distro/pom.xml && \
-    MVN_ARGS="clean install -P ${OMRS_PROFILE}"; \
-    if [[ "$MVN_ARGS" != "deploy -P ${OMRS_PROFILE}" || "$(arch)" = "x86_64" ]]; then \
-    mvn $MVN_ARGS_SETTINGS $MVN_ARGS; \
-    else \
-    mvn $MVN_ARGS_SETTINGS clean install -P ${OMRS_PROFILE}; \
-    fi
+    mvn $MVN_ARGS_SETTINGS clean install -Dmaven.deploy.skip=true && \
+    \
+    cp /openmrs_distro/distro/target/sdk-distro/web/openmrs_core/openmrs.war /openmrs/distribution/openmrs_core/ && \
+    (mkdir -p /tmp/war-add/WEB-INF/lib && cp /openmrs_distro/nidan-dialect/target/nidan-dialect-1.0.0.jar /tmp/war-add/WEB-INF/lib/ && cd /tmp/war-add && jar uf /openmrs/distribution/openmrs_core/openmrs.war WEB-INF/lib/nidan-dialect-1.0.0.jar) && \
+    cp /openmrs_distro/distro/target/sdk-distro/web/openmrs-distro.properties /openmrs/distribution/ && \
+    cp -R /openmrs_distro/distro/target/sdk-distro/web/openmrs_modules /openmrs/distribution/openmrs_modules/ && \
+    cp -R /openmrs_distro/distro/target/sdk-distro/web/openmrs_owas /openmrs/distribution/openmrs_owas/ && \
+    cp -R /openmrs_distro/distro/target/sdk-distro/web/openmrs_config /openmrs/distribution/openmrs_config/ && \
+    cp -R /tmp/openmrs-content-referenceapplication-demo/configuration/* /openmrs/distribution/openmrs_config/ && \
+    rm -rf /tmp/openmrs-content-referenceapplication-demo && \
+    \
+    mvn $MVN_ARGS_SETTINGS clean
 
-RUN cp /openmrs_distro/distro/target/sdk-distro/web/openmrs_core/openmrs.war /openmrs/distribution/openmrs_core/
-
-RUN cp /openmrs_distro/distro/target/sdk-distro/web/openmrs-distro.properties /openmrs/distribution/
-RUN cp -R /openmrs_distro/distro/target/sdk-distro/web/openmrs_modules /openmrs/distribution/openmrs_modules/
-RUN cp -R /openmrs_distro/distro/target/sdk-distro/web/openmrs_owas /openmrs/distribution/openmrs_owas/
-# SDK build-distro only includes config from referenceapplication base (8 domains).
-# Overlay full configuration from cloned content so all domains are present.
-COPY --from=content-clone /content/configuration /tmp/content-config
-RUN cp -R /openmrs_distro/distro/target/sdk-distro/web/openmrs_config /openmrs/distribution/openmrs_config/ && \
-    cp -R /tmp/content-config/* /openmrs/distribution/openmrs_config/ && \
-    rm -rf /tmp/content-config
-
-# Clean up after copying needed artifacts
-RUN mvn $MVN_ARGS_SETTINGS clean
-
-### Run Stage
+### Run stage (production)
 FROM openmrs/openmrs-core:2.8.x-amazoncorretto-21
 
-# Copy built artifacts from dev stage
+# Copy built artifacts from dev stage (nidan-dialect JAR is embedded in openmrs.war WEB-INF/lib)
 COPY --from=dev /openmrs/distribution/openmrs_core/openmrs.war /openmrs/distribution/openmrs_core/
 COPY --from=dev /openmrs/distribution/openmrs-distro.properties /openmrs/distribution/
 COPY --from=dev /openmrs/distribution/openmrs_modules /openmrs/distribution/openmrs_modules
 COPY --from=dev /openmrs/distribution/openmrs_owas /openmrs/distribution/openmrs_owas
 COPY --from=dev /openmrs/distribution/openmrs_config /openmrs/distribution/openmrs_config
 
-# Copy custom SNAPSHOT modules (attachments, appointments, fhir2, bahmni-ipd,
-# medication-administration, orderexpansion — see custom_modules/README)
+# Overlay custom modules (bahmni-ipd, attachments, appointments, etc. — runtime-only or not in distro)
 COPY custom_modules/ /openmrs/distribution/openmrs_modules/
-
-# Copy Nidan PostgreSQL Dialect jar into Tomcat shared lib
-# (startup-custom.sh also injects it into the WAR's WEB-INF/lib for safety)
-COPY nidan-dialect.jar /usr/local/tomcat/lib/nidan-dialect.jar

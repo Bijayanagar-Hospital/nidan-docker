@@ -1,5 +1,5 @@
 #!/bin/bash -aeu
-#       Custom startup script for Nidan to inject Hibernate Dialect
+#       Custom startup script for Nidan (PostgreSQL URL fix; no custom dialect)
 
 source /openmrs/startup-init.sh
 
@@ -43,25 +43,15 @@ TOMCAT_TEMP_DIR="$TOMCAT_DIR/temp"
 TOMCAT_SETENV_FILE="$TOMCAT_DIR/bin/setenv.sh"
 
 echo "Clearing out Tomcat directories"
+rm -fR "${TOMCAT_WEBAPPS_DIR:?}/*"
+rm -fR "${TOMCAT_WORK_DIR:?}/*"
+rm -fR "${TOMCAT_TEMP_DIR:?}/*"
 
-rm -fR "${TOMCAT_WEBAPPS_DIR:?}"/*
-rm -fR "${TOMCAT_WORK_DIR:?}"/*
-rm -fR "${TOMCAT_TEMP_DIR:?}"/*
+echo "Loading WAR into appropriate location"
+cp -r "${OMRS_DISTRO_CORE}/." "${TOMCAT_WEBAPPS_DIR}"
 
-echo "Extracting and Injecting Nidan PostgreSQL Dialect..."
-cp "${OMRS_DISTRO_CORE}/openmrs.war" "${TOMCAT_WEBAPPS_DIR}/openmrs.war"
-mkdir -p "${TOMCAT_WEBAPPS_DIR}/openmrs"
-cd "${TOMCAT_WEBAPPS_DIR}/openmrs"
-jar xf ../openmrs.war
-mkdir -p WEB-INF/lib
-cp /tmp/nidan-dialect.jar WEB-INF/lib/
-rm ../openmrs.war
-
- if [ -f "${OMRS_RUNTIME_PROPERTIES_FILE}" ]; then
-  echo "Force updating ${OMRS_RUNTIME_PROPERTIES_FILE} with Nidan specific settings"
-  # Replace dialect, even if it has different casing or formatting
-  sed -i 's/^hibernate\.dialect=.*/hibernate\.dialect=org\.openmrs\.hibernate\.dialect\.NidanPostgreSQLDialect/' "${OMRS_RUNTIME_PROPERTIES_FILE}"
-  
+if [ -f "${OMRS_RUNTIME_PROPERTIES_FILE}" ]; then
+  echo "Force updating ${OMRS_RUNTIME_PROPERTIES_FILE} with database connection"
   # Update connection.url and remove potential backslash escapes
   # We'll use a more direct approach to make sure the URL is correct
   # Some OpenMRS images write escaped values (jdbc\:postgresql\://...) and we have
@@ -73,9 +63,9 @@ rm ../openmrs.war
 
   if [ -n "${OMRS_DB_URL-}" ]; then
     # Force a clean, unescaped JDBC URL from the container environment.
-    # Keep it single-line and always include stringtype=unspecified.
+    # PostgreSQL: add stringtype=unspecified for CLOB handling. MySQL: no change.
     url="${OMRS_DB_URL}"
-    if [[ ! "$url" =~ "stringtype=unspecified" ]]; then
+    if [[ "$url" == *"postgresql"* ]] && [[ ! "$url" =~ "stringtype=unspecified" ]]; then
       if [[ "$url" == *"?"* ]]; then
         url="${url}&stringtype=unspecified"
       else

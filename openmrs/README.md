@@ -2,6 +2,45 @@
 
 This folder contains the build context for the OpenMRS 3.x Backend and Frontend.
 
+## Production Build (Option B)
+
+The Dockerfile performs a full custom build from source:
+1. **Content**: Cloned from `Trigonal-Technology/openmrs-content-referenceapplication-demo` (override with `CONTENT_REPO_URL`, `CONTENT_REPO_REF`)
+2. **Distro**: `distro/` controls backend modules via `distro-no-demo.properties`
+3. **Custom modules**: `custom_modules/` provides Nidan OMODs (attachments, appointments, medication-administration, etc.)
+
+### Prerequisites
+
+Populate `custom_modules/` with `.omod` files before building (see `custom_modules/README.md`):
+
+```bash
+# From repo root
+cd openmrs-backend/openmrs-module-medication-administration && mvn package -DskipTests && cp omod/target/*.omod ../../../nidan-docker/openmrs/custom_modules/
+# Repeat for attachments, appointments, etc.
+```
+
+### Build
+
+```bash
+cd nidan-docker
+docker-compose build openmrs-backend
+docker-compose up -d openmrs-backend
+```
+
+**If Maven dependency resolution fails** (e.g. `openmrs.jfrog.io:443 failed to respond`):
+- Retry the build (OpenMRS Maven repo can have transient issues)
+- Try with host network: `docker build --network=host -f openmrs/Dockerfile ./openmrs`
+- Check [OpenMRS status](https://status.openmrs.org/) for repo outages
+
+### Build args
+
+| ARG | Default | Description |
+|-----|---------|-------------|
+| CONTENT_REPO_URL | Trigonal-Technology/... | Content repo URL |
+| CONTENT_REPO_REF | main | Branch or tag |
+| CONTENT_VERSION | 1.8.0-nidan-SNAPSHOT | Content package version |
+| CACHE_BUST | — | Set to invalidate cache |
+
 ## 1. Backend Customization (`distro/pom.xml`)
 
 To add **Custom Backend Modules** (Java/OMODs):
@@ -48,3 +87,38 @@ To apply changes:
 1.  Edit the file.
 2.  The Dockerfile copies it to the web root.
 3.  Rebuild `openmrs-frontend`.
+
+## 4. Database: MySQL vs PostgreSQL
+
+OpenMRS uses **MySQL/MariaDB** by default. Set `OPENMRS_DB_ROOT_PASSWORD` in `.env`. PostgreSQL is kept as `openmrs-db-postgres` (profile `openmrs-postgres`); run with `docker-compose --profile openmrs-postgres up` to start it.
+
+## 5. Local Content Build (PostgreSQL fixes)
+
+The content repo `openmrs-content-referenceapplication-demo` includes **PostgreSQL liquibase fixes** in `configuration/liquibase/liquibase.xml`. These run first (LIQUIBASE is the Initializer's first domain) and fix "Bad value for type long" errors.
+
+To build with **local content** (your edits to the content repo):
+
+```bash
+cd nidan-docker
+docker-compose -f docker-compose.yml -f docker-compose.openmrs-local-content.yml build openmrs-backend
+docker-compose -f docker-compose.yml -f docker-compose.openmrs-local-content.yml up -d openmrs-backend
+```
+
+Requires: `openmrs-backend` and `nidan-docker` as siblings under the same repo root.
+
+## 6. Troubleshooting: Metadata / Initializer Not Loading
+
+If OpenMRS starts but **no concepts, locations, or other metadata** appear:
+
+### PostgreSQL "Bad value for type long"
+
+Use the local content build (above) so the liquibase fixes in the content repo are included. Then do a **fresh database**:
+
+```bash
+docker-compose down -v
+docker-compose -f docker-compose.yml -f docker-compose.openmrs-local-content.yml up -d openmrs-backend
+```
+
+### Configuration volume
+
+The `./configuration:/openmrs/data/configuration` mount is **commented out** by default. Config comes from the baked-in image.

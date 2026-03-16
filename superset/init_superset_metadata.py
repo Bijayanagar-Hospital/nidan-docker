@@ -12,14 +12,16 @@ from urllib.parse import quote_plus
 sys.path.insert(0, "/app")
 
 
-def get_db_uri(prefix: str, default_host: str) -> str:
-    """Build PostgreSQL connection URI from env vars."""
+def get_db_uri(prefix: str, default_host: str, db_type: str = "postgresql") -> str:
+    """Build database connection URI from env vars. db_type: postgresql or mysql."""
     host = os.environ.get(f"{prefix}_HOST", default_host)
-    port = os.environ.get(f"{prefix}_PORT", "5432")
+    port = os.environ.get(f"{prefix}_PORT", "5432" if db_type == "postgresql" else "3306")
     name = os.environ.get(f"{prefix}_NAME", "")
     user = os.environ.get(f"{prefix}_USER", "")
     password = os.environ.get(f"{prefix}_PASSWORD", "")
     safe_password = quote_plus(password) if password else ""
+    if db_type == "mysql":
+        return f"mysql+pymysql://{user}:{safe_password}@{host}:{port}/{name}"
     return f"postgresql://{user}:{safe_password}@{host}:{port}/{name}"
 
 
@@ -29,7 +31,7 @@ def main():
     app = create_app()
 
     DB_CONFIGS = {
-        "openmrs": {"name": "OpenMRS", "uri": get_db_uri("OPENMRS_DB", "openmrs-db")},
+        "openmrs": {"name": "OpenMRS", "uri": get_db_uri("OPENMRS_DB", "openmrs-db", "mysql")},
         "openelis": {"name": "OpenELIS", "uri": get_db_uri("OPENELIS_DB", "openelis-db")},
         "odoo": {"name": "Odoo", "uri": get_db_uri("ODOO_DB", "odoo-db")},
     }

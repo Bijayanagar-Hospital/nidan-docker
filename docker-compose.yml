@@ -5,6 +5,7 @@ networks:
 volumes:
   openmrs-data:
   openmrs-db-data:
+  openmrs-db-postgres-data:
   odoo-data:
   odoo-db-data:
   orthanc-data:
@@ -67,20 +68,21 @@ services:
     user: root
     container_name: nidan-openmrs-backend
     environment:
-      # Database (OMRS_DB_HOSTNAME/OMRS_DB_PORT used by wait-for-it.sh; OMRS_DB_URL for connection)
-      OMRS_DB: postgresql
+      # Database (MySQL) - OMRS_DB_HOSTNAME/OMRS_DB_PORT used by wait-for-it.sh; OMRS_DB_URL for connection
+      OMRS_DB: mysql
       OMRS_DB_HOSTNAME: openmrs-db
-      OMRS_DB_PORT: "5432"
-      OMRS_DB_URL: jdbc:postgresql://openmrs-db:5432/${OPENMRS_DB_NAME:-openmrs}?stringtype=unspecified
+      OMRS_DB_PORT: "3306"
+      OMRS_DB_URL: jdbc:mysql://openmrs-db:3306/${OPENMRS_DB_NAME:-openmrs}?autoReconnect=true&useUnicode=true&characterEncoding=UTF-8&sessionVariables=storage_engine=InnoDB
       OMRS_DB_USERNAME: ${OPENMRS_DB_USER:-openmrs}
       OMRS_DB_PASSWORD: ${OPENMRS_DB_PASSWORD:-openmrs}
-      # Installation (has_current_openmrs_database=true skips MySQL "create database" - postgres init already created it)
+      OMRS_DB_DRIVER_CLASS: com.mysql.cj.jdbc.Driver
+      # Installation (MySQL creates DB via MYSQL_DATABASE; skip OpenMRS create-database step)
       OMRS_CONFIG_MODULE_WEB_ADMIN: "true"
       OMRS_CONFIG_AUTO_UPDATE_DATABASE: "true"
       OMRS_CONFIG_CREATE_TABLES: "true"
       OMRS_CONFIG_HAS_CURRENT_OPENMRS_DATABASE: "true"
-      # JVM (Nidan dialect + PostgreSQL LOB handling)
-      _JAVA_OPTIONS: "-Dcsrf.enabled=false -Dhibernate.dialect=org.openmrs.hibernate.dialect.NidanPostgreSQLDialect -Dhibernate.jdbc.lob.non_contextual_creation=true"
+      # JVM (optional overrides)
+      # _JAVA_OPTIONS: "-Dcsrf.enabled=false"
     networks:
       - nidan-network
     depends_on:
@@ -88,11 +90,9 @@ services:
         condition: service_healthy
     volumes:
       - openmrs-data:/openmrs/data
-      - ./openmrs/nidan-dialect.jar:/tmp/nidan-dialect.jar:ro
       - ./openmrs/startup-custom.sh:/openmrs/startup.sh:ro
-      # Uncomment to use local config for Initializer debugging (path relative to nidan-docker; adjust if layout differs).
-      # Mount at distribution so startup-init copies it to /openmrs/data/configuration:
-      # - ../openmrs-backend/openmrs-content-referenceapplication-demo/configuration:/openmrs/distribution/openmrs_config:ro
+      # Uncomment to override config with local folder (for Initializer debugging):
+      # - ./configuration:/openmrs/data/configuration
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8080/openmrs/" ]
       interval: 30s
@@ -124,8 +124,33 @@ services:
       retries: 3
 
   openmrs-db:
-    image: postgres:15-alpine
+    image: mariadb:10.11
     container_name: nidan-openmrs-db
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: [ "CMD", "healthcheck.sh", "--connect", "--innodb_initialized" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_DATABASE: ${OPENMRS_DB_NAME:-openmrs}
+      MYSQL_USER: ${OPENMRS_DB_USER:-openmrs}
+      MYSQL_PASSWORD: ${OPENMRS_DB_PASSWORD:-openmrs}
+      MYSQL_ROOT_PASSWORD: ${OPENMRS_DB_ROOT_PASSWORD:-openmrs}
+    volumes:
+      - openmrs-db-data:/var/lib/mysql
+    networks:
+      - nidan-network
+
+  # PostgreSQL for OpenMRS (kept for future/fallback; not used when MySQL is active)
+  openmrs-db-postgres:
+    image: postgres:15-alpine
+    container_name: nidan-openmrs-db-postgres
+    profiles:
+      - openmrs-postgres
     command: >
       postgres -c wal_level=logical -c max_slot_wal_keep_size=${POSTGRES_MAX_SLOT_WAL_KEEP_SIZE:-1GB}
     healthcheck:
@@ -140,7 +165,7 @@ services:
       POSTGRES_USER: ${OPENMRS_DB_USER:-openmrs}
       POSTGRES_PASSWORD: ${OPENMRS_DB_PASSWORD:-openmrs}
     volumes:
-      - openmrs-db-data:/var/lib/postgresql/data
+      - openmrs-db-postgres-data:/var/lib/postgresql/data
       - ./openmrs-db/init-openmrs-db.sql:/docker-entrypoint-initdb.d/init-openmrs-db.sql:ro
     networks:
       - nidan-network
@@ -655,7 +680,7 @@ services:
       
       # Database connections (seeded at startup for OpenMRS, OpenELIS, Odoo)
       OPENMRS_DB_HOST: ${OPENMRS_DB_HOST:-openmrs-db}
-      OPENMRS_DB_PORT: ${OPENMRS_DB_PORT:-5432}
+      OPENMRS_DB_PORT: ${OPENMRS_DB_PORT:-3306}
       OPENMRS_DB_NAME: ${OPENMRS_DB_NAME:-openmrs}
       OPENMRS_DB_USER: ${OPENMRS_DB_USER:-openmrs}
       OPENMRS_DB_PASSWORD: ${OPENMRS_DB_PASSWORD:-openmrs}
