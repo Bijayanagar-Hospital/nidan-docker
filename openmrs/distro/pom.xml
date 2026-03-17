@@ -169,15 +169,15 @@
             <version>${queue.version}</version>
             <scope>provided</scope>
         </dependency>
-        <!-- appointments is provided by custom_modules/ (Bahmni SNAPSHOT) — comment out to avoid conflict -->
-        <!--
+        
+        <!-- appointments is provided by custom_modules/ (Nidan SNAPSHOT) -->
         <dependency>
             <groupId>org.bahmni.module</groupId>
             <artifactId>appointments-omod</artifactId>
             <version>${appointments.version}</version>
             <scope>provided</scope>
         </dependency>
-        -->
+       
         <dependency>
             <groupId>org.bahmni.module</groupId>
             <artifactId>teleconsultation-omod</artifactId>
@@ -190,6 +190,7 @@
             <version>${cohort.version}</version>
             <scope>provided</scope>
         </dependency>
+        
         <!-- communication provided by custom_modules/ (Nidan SNAPSHOT) — comment out to avoid version conflict -->
         <!--
         <dependency>
@@ -259,6 +260,7 @@
             <version>${bedmanagement.version}</version>
             <scope>provided</scope>
         </dependency>
+        
         <!-- medication-administration provided by custom_modules/ (Nidan build without bahmnicore) -->
         <!--
         <dependency>
@@ -287,13 +289,15 @@
             <scope>provided</scope>
         </dependency>
         -->
+
         <dependency>
             <groupId>org.openmrs.module</groupId>
             <artifactId>ordertemplates-omod</artifactId>
             <version>${ordertemplates.version}</version>
             <scope>provided</scope>
         </dependency>
-        <!-- orderexpansion provided by custom_modules/ (Nidan SNAPSHOT) — comment out to avoid version conflict -->
+       
+       <!-- orderexpansion provided by custom_modules/ (Nidan SNAPSHOT) — comment out to avoid version conflict -->
         <!--
         <dependency>
             <groupId>org.openmrs.module</groupId>
