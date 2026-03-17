@@ -95,13 +95,22 @@ if [ -f "${OMRS_RUNTIME_PROPERTIES_FILE}" ]; then
       echo "connection.url=${url}" >> "${OMRS_RUNTIME_PROPERTIES_FILE}"
     fi
   fi
+
+  # Disable Elasticsearch discovery so context refresh doesn't block on es:9200 (no ES in stack)
+  sed -i.bak 's|^hibernate\.search\.backend\.uris=.*|hibernate.search.backend.uris=|' "${OMRS_RUNTIME_PROPERTIES_FILE}" 2>/dev/null || true
+  sed -i.bak 's|^hibernate\.search\.backend\.discovery\.enabled=.*|hibernate.search.backend.discovery.enabled=false|' "${OMRS_RUNTIME_PROPERTIES_FILE}" 2>/dev/null || true
+  grep -q '^hibernate\.search\.backend\.uris=' "${OMRS_RUNTIME_PROPERTIES_FILE}" || echo "hibernate.search.backend.uris=" >> "${OMRS_RUNTIME_PROPERTIES_FILE}"
+  grep -q '^hibernate\.search\.backend\.discovery\.enabled=' "${OMRS_RUNTIME_PROPERTIES_FILE}" || echo "hibernate.search.backend.discovery.enabled=false" >> "${OMRS_RUNTIME_PROPERTIES_FILE}"
+  rm -f "${OMRS_RUNTIME_PROPERTIES_FILE}.bak" 2>/dev/null || true
+
   cat "${OMRS_RUNTIME_PROPERTIES_FILE}"
 fi
 
 echo "Writing out $TOMCAT_SETENV_FILE file"
 
 JAVA_OPTS="$OMRS_JAVA_SERVER_OPTS"
-CATALINA_OPTS="${OMRS_JAVA_MEMORY_OPTS} -DOPENMRS_INSTALLATION_SCRIPT=${OMRS_SERVER_PROPERTIES_FILE} -DOPENMRS_APPLICATION_DATA_DIRECTORY=${OMRS_DATA_DIR}/"
+# Override Hibernate Search to avoid blocking on es:9200 (no ES in stack) - JVM -D takes precedence
+CATALINA_OPTS="${OMRS_JAVA_MEMORY_OPTS} -DOPENMRS_INSTALLATION_SCRIPT=${OMRS_SERVER_PROPERTIES_FILE} -DOPENMRS_APPLICATION_DATA_DIRECTORY=${OMRS_DATA_DIR}/ -Dhibernate.search.backend.uris= -Dhibernate.search.backend.discovery.enabled=false"
 
 if [ -n "${OMRS_DEV_DEBUG_PORT-}" ]; then
   echo "Enabling debugging on port ${OMRS_DEV_DEBUG_PORT}"
@@ -122,6 +131,16 @@ EOF
 
 echo "Starting up OpenMRS..."
 
+# Heartbeat: Spring context refresh produces no logs for 15-25 min; echo progress so docker logs shows activity
+(
+  while true; do
+    sleep 120
+    echo "[$(date +%H:%M:%S)] OpenMRS still starting... (context refresh can take 15-25 min with many modules)"
+  done
+) &
+HEARTBEAT_PID=$!
+trap "kill $HEARTBEAT_PID 2>/dev/null || true" EXIT
+
 /usr/local/tomcat/bin/catalina.sh run &
 
 # Trigger first filter to start data import (Initializer runs on first request)
@@ -129,6 +148,7 @@ echo "Waiting for Tomcat to initialize (60s)..."
 sleep 60
 for i in 1 2 3 4 5 6 7 8 9 10; do
   if curl -sf "http://localhost:8080/${OMRS_WEBAPP_NAME}/" > /dev/null; then
+    kill $HEARTBEAT_PID 2>/dev/null || true
     echo "OpenMRS responded; Initializer will load metadata."
     break
   fi

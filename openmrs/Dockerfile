@@ -40,11 +40,6 @@ RUN \
     echo "statsEnabled=false" > sdk-stats.properties && \
     echo "CACHE_BUST=${CACHE_BUST}" >/dev/null && \
     \
-    for f in /openmrs_distro/custom_modules/medication-administration-*.omod; do \
-      [ -f "$$f" ] && mvn install:install-file -Dfile="$$f" \
-        -DgroupId=org.bahmni.module -DartifactId=medication-administration-omod \
-        -Dversion=2.0.0-SNAPSHOT -Dpackaging=jar -q; break; \
-    done && \
     mvn -f /openmrs_distro/nidan-dialect/pom.xml package -DskipTests -q && \
     \
     sed -i "s|<version>1.8.0-SNAPSHOT</version>|<version>${CONTENT_VERSION}</version>|" /tmp/openmrs-content-referenceapplication-demo/pom.xml && \

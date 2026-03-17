@@ -63,7 +63,6 @@ services:
   # # ============================================================================
   openmrs-backend:
     build: ./openmrs
-    # image: openmrs/openmrs-reference-application-3-backend:${TAG:-qa}
     image: nidan-docker-openmrs-backend
     user: root
     container_name: nidan-openmrs-backend
@@ -81,8 +80,18 @@ services:
       OMRS_CONFIG_AUTO_UPDATE_DATABASE: "true"
       OMRS_CONFIG_CREATE_TABLES: "true"
       OMRS_CONFIG_HAS_CURRENT_OPENMRS_DATABASE: "true"
+      # Debug mode: attach remote debugger on port 5005 (e.g. from IDE) - disable to speed startup
+      # OMRS_DEV_DEBUG_PORT: "5005"
+      # JVM: more heap for faster Spring context refresh (many modules = slow bean creation)
+      OMRS_JAVA_MEMORY_OPTS: "-Xmx2g -Xms1g"
       # JVM (optional overrides)
       # _JAVA_OPTIONS: "-Dcsrf.enabled=false"
+      # Initializer: log to main openmrs.log; exclude OCL domain (Initializer OCL load; module stays enabled)
+      # Disable ES discovery so context refresh doesn't block on es:9200 (no ES in stack)
+      # Allow circular refs: workaround for BeanCurrentlyInCreationException (AOP/Advisor bean cycle)
+      OMRS_JAVA_SERVER_OPTS: "-Dinitializer.logging.enabled=false -Dinitializer.domains=!ocl -Dspring.main.allow-circular-references=true -Dhibernate.search.backend.uris= -Dhibernate.search.backend.discovery.enabled=false"
+    ports:
+      - "5005:5005"  # Remote debug port
     networks:
       - nidan-network
     depends_on:
@@ -97,8 +106,8 @@ services:
       test: [ "CMD", "curl", "-f", "http://localhost:8080/openmrs/" ]
       interval: 30s
       timeout: 10s
-      retries: 10
-      start_period: 120s
+      retries: 15
+      start_period: 1200s
 
   openmrs-frontend:
     build: ./openmrs/frontend
