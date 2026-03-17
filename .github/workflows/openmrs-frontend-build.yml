@@ -1,6 +1,5 @@
 # OpenMRS Frontend Docker Build & Push
 # Triggers ONLY when openmrs/frontend/** changes.
-# Backend changes do not trigger this workflow (see openmrs-build.yml for backend).
 
 name: OpenMRS Frontend Build & Push
 
@@ -8,11 +7,13 @@ on:
   push:
     branches:
       - dev
+      - main
     paths:
       - 'openmrs/frontend/**'
   pull_request:
     branches:
       - dev
+      - main
     paths:
       - 'openmrs/frontend/**'
 
@@ -56,8 +57,8 @@ jobs:
         with:
           images: ${{ env.IMAGE_BASE }}/openmrs-frontend
           tags: |
-            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/dev' }}
-            type=raw,value=dev,enable=${{ github.ref == 'refs/heads/dev' }}
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/dev' || github.base_ref == 'dev' }}
+            type=raw,value=stable,enable=${{ github.ref == 'refs/heads/main' || github.base_ref == 'main' }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5

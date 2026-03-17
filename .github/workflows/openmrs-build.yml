@@ -1,6 +1,6 @@
 # OpenMRS Backend Docker Build & Push
-# Triggers only on backend-relevant changes (excludes openmrs/frontend/**).
-# Frontend has its own workflow (openmrs-frontend-build.yml).
+# Triggers on changes in openmrs/ EXCEPT openmrs/frontend/
+# (custom_modules, distro, Dockerfile, etc.)
 
 name: OpenMRS Backend Build & Push
 
@@ -8,35 +8,17 @@ on:
   push:
     branches:
       - dev
+      - main
     paths:
-      - 'openmrs/Dockerfile'
-      - 'openmrs/pom.xml'
-      - 'openmrs/*.sh'
-      - 'openmrs/*.jar'
-      - 'openmrs/*.java'
-      - 'openmrs/*.class'
-      - 'openmrs/*.md'
-      - 'openmrs/distro/**'
-      - 'openmrs/custom_modules/**'
-      - 'openmrs/classes/**'
-      - 'openmrs/org/**'
-      - 'openmrs/scripts/**'
+      - 'openmrs/**'
+      - '!openmrs/frontend/**'
   pull_request:
     branches:
       - dev
+      - main
     paths:
-      - 'openmrs/Dockerfile'
-      - 'openmrs/pom.xml'
-      - 'openmrs/*.sh'
-      - 'openmrs/*.jar'
-      - 'openmrs/*.java'
-      - 'openmrs/*.class'
-      - 'openmrs/*.md'
-      - 'openmrs/distro/**'
-      - 'openmrs/custom_modules/**'
-      - 'openmrs/classes/**'
-      - 'openmrs/org/**'
-      - 'openmrs/scripts/**'
+      - 'openmrs/**'
+      - '!openmrs/frontend/**'
 
 concurrency:
   group: openmrs-backend-${{ github.ref }}
@@ -78,8 +60,8 @@ jobs:
         with:
           images: ${{ env.IMAGE_BASE }}/openmrs-backend
           tags: |
-            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/dev' }}
-            type=raw,value=dev,enable=${{ github.ref == 'refs/heads/dev' }}
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/dev' || github.base_ref == 'dev' }}
+            type=raw,value=stable,enable=${{ github.ref == 'refs/heads/main' || github.base_ref == 'main' }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
