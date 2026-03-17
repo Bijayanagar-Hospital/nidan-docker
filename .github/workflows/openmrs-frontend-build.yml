@@ -4,6 +4,7 @@
 name: OpenMRS Frontend Build & Push
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - dev

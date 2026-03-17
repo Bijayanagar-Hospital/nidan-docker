@@ -5,6 +5,7 @@
 name: OpenMRS Backend Build & Push
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - dev
