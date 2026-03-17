@@ -145,3 +145,8 @@ docker-compose -f docker-compose.yml -f docker-compose.openmrs-local-content.yml
 ### 4. Configuration volume
 
 The `./configuration:/openmrs/data/configuration` mount is **commented out** by default. Config comes from the baked-in image.
+
+### 5. OCL concepts not loading
+
+- **Checksum skip**: When using a mounted config, the startup script clears OCL checksums so concepts reload every time (avoids skip after DB reset).
+- **Module version**: The distro uses Open Concept Lab 2.4.0 for compatibility with the Initializer's OCL loader.

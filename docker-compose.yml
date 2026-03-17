@@ -85,13 +85,9 @@ services:
       # JVM: more heap for faster Spring context refresh (many modules = slow bean creation)
       OMRS_JAVA_MEMORY_OPTS: "-Xmx2g -Xms1g"
       # JVM (optional overrides)
-      # _JAVA_OPTIONS: "-Dcsrf.enabled=false"
-      # Initializer: log to main openmrs.log; exclude OCL domain (Initializer OCL load; module stays enabled)
-      # Disable ES discovery so context refresh doesn't block on es:9200 (no ES in stack)
-      # Allow circular refs: workaround for BeanCurrentlyInCreationException (AOP/Advisor bean cycle)
-      OMRS_JAVA_SERVER_OPTS: "-Dinitializer.logging.enabled=false -Dinitializer.domains=!ocl -Dspring.main.allow-circular-references=true -Dhibernate.search.backend.uris= -Dhibernate.search.backend.discovery.enabled=false"
-    ports:
-      - "5005:5005"  # Remote debug port
+      _JAVA_OPTIONS: "-Dcsrf.enabled=false"
+    # ports:
+    #   - "5005:5005"  # Remote debug port
     networks:
       - nidan-network
     depends_on:
@@ -100,8 +96,6 @@ services:
     volumes:
       - openmrs-data:/openmrs/data
       - ./openmrs/startup-custom.sh:/openmrs/startup.sh:ro
-      # Uncomment to override config with local folder (for Initializer debugging):
-      # - ./configuration:/openmrs/data/configuration
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8080/openmrs/" ]
       interval: 30s

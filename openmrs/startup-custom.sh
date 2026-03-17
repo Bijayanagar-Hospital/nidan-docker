@@ -8,9 +8,32 @@ mkdir -p "$DATA_DIR"
 
 # Ensure Initializer configuration exists (required for metadata loading)
 if [ -d /openmrs/distribution/openmrs_config ]; then
-  echo "Ensuring Initializer configuration at $DATA_DIR/configuration"
-  rm -rf "$DATA_DIR/configuration"
-  cp -R /openmrs/distribution/openmrs_config "$DATA_DIR/configuration"
+  CONFIG_DEST="$DATA_DIR/configuration"
+  mkdir -p "$CONFIG_DEST"
+  # Skip overwrite when configuration is a mount point (local config for debugging)
+  if grep -q " $CONFIG_DEST " /proc/mounts 2>/dev/null; then
+    echo "Configuration is a mount point - using existing config (not overwriting)"
+    # Force OCL reload: when using local config, clear OCL checksums so Initializer
+    # reloads concepts (avoids skip after DB reset or stale checksums)
+    if [ -d "$DATA_DIR/configuration_checksums/ocl" ]; then
+      echo "Clearing OCL checksums to force concept reload (mounted config)"
+      rm -rf "$DATA_DIR/configuration_checksums/ocl"
+    fi
+  else
+    echo "Ensuring Initializer configuration at $CONFIG_DEST"
+    if command -v rsync >/dev/null 2>&1; then
+      rsync -a --delete /openmrs/distribution/openmrs_config/ "$CONFIG_DEST/"
+    else
+      find "$CONFIG_DEST" -mindepth 1 -delete 2>/dev/null || true
+      cp -R /openmrs/distribution/openmrs_config/* "$CONFIG_DEST/"
+    fi
+  fi
+  # Copy OCL zip files from /ocl-zips mount (if present) into configuration/ocl/
+  if [ -d /ocl-zips ] && ls /ocl-zips/*.zip 1>/dev/null 2>&1; then
+    echo "Copying OCL zip files from /ocl-zips into configuration/ocl/"
+    mkdir -p "$CONFIG_DEST/ocl/referenceapplication-demo"
+    cp -v /ocl-zips/*.zip "$CONFIG_DEST/ocl/referenceapplication-demo/" 2>/dev/null || true
+  fi
 fi
 
 # Copy property files to data dir (appointment.properties, etc.)
