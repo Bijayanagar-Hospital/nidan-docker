@@ -29,8 +29,9 @@ services:
   # PROXY / GATEWAY
   # ============================================================================
   gateway:
-    build: ./proxy
-    image: nidan/gateway:latest
+    # build: ./proxy  # local dev: docker compose build gateway
+    # CI: dev → trigonaltechnology/gateway:latest | main → :stable
+    image: ${GATEWAY_IMAGE:-trigonaltechnology/gateway:latest}
     ports:
       - "80:80"
       - "443:443"
