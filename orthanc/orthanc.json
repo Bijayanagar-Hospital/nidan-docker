@@ -33,5 +33,9 @@
             "EnableOpenInOhifViewer3": true,
             "OhifViewer3PublicRoot": "/ohif/"
         }
+    },
+    "WebhookOnStoredInstance": {
+        "URL": "${ORTHANC_WEBHOOK_URL}",
+        "Events": ["NewStudy"]
     }
 }

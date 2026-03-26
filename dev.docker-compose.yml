@@ -464,11 +464,8 @@ services:
     ports:
       - "${CIS_PORT:-8081}:${CIS_PORT:-8081}"
 
-    # To call an EXTERNAL HTTPS OpenELIS :
-    # 1) Map the ELIS hostname to your ELIS IP
-    # extra_hosts:
-    #   - "elis.openelis-global.org:192.168.1.74"
-    # 2) Mount a truststore built from the ELIS TLS certificate
+    # TLS truststore: run scripts/create-gateway-truststore.sh if gateway-truststore.p12 is missing.
+    # Override with CIS_JAVA_TOOL_OPTIONS= (empty) only when debugging without this mount.
     volumes:
       - ./gateway-truststore.p12:/etc/ssl/certs/gateway-truststore.p12:ro
     environment:
@@ -504,7 +501,7 @@ services:
       - OPENELIS_ORDER_BUNDLE_PATH=${OPENELIS_ORDER_BUNDLE_PATH:-/fhir/tasks}
       - OPENELIS_USERNAME=${OPENELIS_USERNAME:-admin}
       - OPENELIS_PASSWORD=${OPENELIS_PASSWORD:-adminADMIN!}
-      - JAVA_TOOL_OPTIONS=-Djavax.net.ssl.trustStore=/etc/ssl/certs/gateway-truststore.p12 -Djavax.net.ssl.trustStorePassword=gatewayTrust123 -Djdk.internal.httpclient.disableHostnameVerification=true
+      - JAVA_TOOL_OPTIONS=${CIS_JAVA_TOOL_OPTIONS:--Djavax.net.ssl.trustStore=/etc/ssl/certs/gateway-truststore.p12 -Djavax.net.ssl.trustStorePassword=gatewayTrust123 -Djdk.internal.httpclient.disableHostnameVerification=true}
       # Integration
       - INTEGRATION_SOURCE_SYSTEM=${INTEGRATION_SOURCE_SYSTEM:-CIS}
       - INTEGRATION_SKIP_SOURCE_SYSTEMS=${INTEGRATION_SKIP_SOURCE_SYSTEMS:-OPENMRS}

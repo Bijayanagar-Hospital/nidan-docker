@@ -1,5 +1,14 @@
 # Superset Configuration for Path-Based Deployment
 import os
+
+# Use PyMySQL for any mysql:// SQLAlchemy URIs (avoids requiring mysqlclient / MySQLdb C extension)
+try:
+    import pymysql
+
+    pymysql.install_as_MySQLdb()
+except ImportError:
+    pass
+
 from flask import redirect
 from flask_appbuilder import expose, IndexView
 

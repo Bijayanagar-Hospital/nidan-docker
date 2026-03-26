@@ -170,7 +170,7 @@ services:
   #     POSTGRES_PASSWORD: ${OPENMRS_DB_PASSWORD:-openmrs}
   #   volumes:
   #     - openmrs-db-postgres-data:/var/lib/postgresql/data
-  #     - ./openmrs-db/init-openmrs-db.sql:/docker-entrypoint-initdb.d/init-openmrs-db.sql:ro
+  #     - ./openmrs/db/init-openmrs-db.sql:/docker-entrypoint-initdb.d/init-openmrs-db.sql:ro
   #   networks:
   #     - nidan-network
 
@@ -234,7 +234,7 @@ services:
       ODOO_DB_PASSWORD: ${ODOO_DB_PASSWORD}
     volumes:
       - odoo-db-data:/var/lib/postgresql/data
-      - ./odoo-db/init-odoo-db.sh:/docker-entrypoint-initdb.d/init-odoo-db.sh:ro
+      - ./odoo/db/init-odoo-db.sh:/docker-entrypoint-initdb.d/init-odoo-db.sh:ro
     networks:
       - nidan-network
     healthcheck:
@@ -272,6 +272,8 @@ services:
       # Authentication (dynamic/secrets)
       ORTHANC__REGISTERED_USERS: |
         {"${ORTHANC_USERNAME:-nidan}": "${ORTHANC_PASSWORD:-nidan}"}
+      # Dynamic Webhook to CIS
+      ORTHANC_WEBHOOK_URL: "http://${CIS_HOST:-nidan-cis}:${CIS_PORT:-8081}/orthanc/webhook"
     networks:
       - nidan-network
     depends_on:
@@ -450,9 +452,6 @@ services:
       - nidan-network
 
   nidan-cis:
-    # build:
-    #   context: ./middleware
-    #   dockerfile: Dockerfile.cis
     image: trigonaltechnology/nidan-cis:latest
     container_name: nidan-cis
     ports:
@@ -537,10 +536,6 @@ services:
       start_period: 60s
 
   nidan-ois:
-    # build:
-    #   context: ./middleware
-    #   dockerfile: Dockerfile.ois
-    #image: dipakthapa/ois:latest
     image: trigonaltechnology/nidan-ois:latest
     container_name: nidan-ois
     ports:
@@ -682,7 +677,7 @@ services:
   # APACHE SUPERSET
   # ============================================================================
   superset:
-    # build: ./superset  # local dev: docker compose build superset
+    build: ./superset
     image: ${SUPERSET_IMAGE:-trigonaltechnology/superset:latest}
     container_name: nidan-superset
     ports:
