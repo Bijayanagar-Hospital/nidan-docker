@@ -168,29 +168,29 @@ def main():
                     COUNT(DISTINCT CASE WHEN pe.gender = 'F' THEN p.patient_id END) as female_count
                 FROM patient p
                 JOIN person pe ON p.patient_id = pe.person_id
-                WHERE p.voided = false AND p.date_created >= CURRENT_DATE - INTERVAL '90 days'
+                WHERE p.voided = 0 AND p.date_created >= DATE_SUB(CURRENT_DATE, INTERVAL 90 DAY)
                 GROUP BY DATE(p.date_created) ORDER BY registration_date DESC
             """)
             add_dataset("openmrs", "patient_demographics", """
                 SELECT CASE
-                    WHEN EXTRACT(YEAR FROM AGE(pe.birthdate)) < 5 THEN '0-4'
-                    WHEN EXTRACT(YEAR FROM AGE(pe.birthdate)) BETWEEN 5 AND 14 THEN '5-14'
-                    WHEN EXTRACT(YEAR FROM AGE(pe.birthdate)) BETWEEN 15 AND 24 THEN '15-24'
-                    WHEN EXTRACT(YEAR FROM AGE(pe.birthdate)) BETWEEN 25 AND 44 THEN '25-44'
-                    WHEN EXTRACT(YEAR FROM AGE(pe.birthdate)) BETWEEN 45 AND 64 THEN '45-64'
+                    WHEN TIMESTAMPDIFF(YEAR, pe.birthdate, CURDATE()) < 5 THEN '0-4'
+                    WHEN TIMESTAMPDIFF(YEAR, pe.birthdate, CURDATE()) BETWEEN 5 AND 14 THEN '5-14'
+                    WHEN TIMESTAMPDIFF(YEAR, pe.birthdate, CURDATE()) BETWEEN 15 AND 24 THEN '15-24'
+                    WHEN TIMESTAMPDIFF(YEAR, pe.birthdate, CURDATE()) BETWEEN 25 AND 44 THEN '25-44'
+                    WHEN TIMESTAMPDIFF(YEAR, pe.birthdate, CURDATE()) BETWEEN 45 AND 64 THEN '45-64'
                     ELSE '65+' END as age_group,
                     COALESCE(pe.gender, 'Unknown') as gender,
                     COUNT(DISTINCT p.patient_id) as patient_count
                 FROM patient p JOIN person pe ON p.patient_id = pe.person_id
-                WHERE p.voided = false
+                WHERE p.voided = 0
                 GROUP BY 1, COALESCE(pe.gender, 'Unknown') ORDER BY 1, 2
             """)
             add_dataset("openmrs", "patient_location_distribution", """
                 SELECT COALESCE(pa.city_village, 'Unknown') as location,
                     COUNT(DISTINCT p.patient_id) as patient_count
                 FROM patient p JOIN person pe ON p.patient_id = pe.person_id
-                LEFT JOIN person_address pa ON pe.person_id = pa.person_id AND pa.voided = false
-                WHERE p.voided = false
+                LEFT JOIN person_address pa ON pe.person_id = pa.person_id AND pa.voided = 0
+                WHERE p.voided = 0
                 GROUP BY pa.city_village ORDER BY patient_count DESC LIMIT 20
             """)
 
@@ -200,32 +200,37 @@ def main():
                     COALESCE(vt.name, 'Unknown') as visit_type,
                     COUNT(DISTINCT v.visit_id) as visit_count,
                     COUNT(DISTINCT v.patient_id) as unique_patients,
-                    AVG(EXTRACT(EPOCH FROM (COALESCE(v.date_stopped, NOW()) - v.date_started))/3600) as avg_duration_hours
+                    AVG(TIMESTAMPDIFF(SECOND, v.date_started, COALESCE(v.date_stopped, NOW())) / 3600.0) as avg_duration_hours
                 FROM visit v LEFT JOIN visit_type vt ON v.visit_type_id = vt.visit_type_id
-                WHERE v.voided = false AND v.date_started >= CURRENT_DATE - INTERVAL '90 days'
+                WHERE v.voided = 0 AND v.date_started >= DATE_SUB(CURRENT_DATE, INTERVAL 90 DAY)
                 GROUP BY DATE(v.date_started), COALESCE(vt.name, 'Unknown') ORDER BY visit_date DESC
             """)
             add_dataset("openmrs", "daily_census", """
-                SELECT date_series::date as census_date,
-                    COUNT(DISTINCT v.visit_id) as inpatient_count,
-                    COUNT(DISTINCT v.patient_id) as unique_patients
-                FROM generate_series(CURRENT_DATE - INTERVAL '30 days', CURRENT_DATE, INTERVAL '1 day') as date_series
-                LEFT JOIN visit v ON v.date_started::date <= date_series::date
-                    AND (v.date_stopped IS NULL OR v.date_stopped::date >= date_series::date) AND v.voided = false
-                GROUP BY date_series::date ORDER BY census_date DESC
+                WITH RECURSIVE date_series AS (
+                    SELECT DATE_SUB(CURRENT_DATE, INTERVAL 30 DAY) AS d
+                    UNION ALL
+                    SELECT DATE_ADD(d, INTERVAL 1 DAY) FROM date_series WHERE d < CURRENT_DATE
+                )
+                SELECT ds.d AS census_date,
+                    COUNT(DISTINCT v.visit_id) AS inpatient_count,
+                    COUNT(DISTINCT v.patient_id) AS unique_patients
+                FROM date_series ds
+                LEFT JOIN visit v ON DATE(v.date_started) <= ds.d
+                    AND (v.date_stopped IS NULL OR DATE(v.date_stopped) >= ds.d) AND v.voided = 0
+                GROUP BY ds.d ORDER BY census_date DESC
             """)
             add_dataset("openmrs", "encounter_types_distribution", """
                 SELECT COALESCE(et.name, 'Unknown') as encounter_type,
                     COUNT(e.encounter_id) as encounter_count,
                     COUNT(DISTINCT e.patient_id) as unique_patients
                 FROM encounter e LEFT JOIN encounter_type et ON e.encounter_type = et.encounter_type_id
-                WHERE e.voided = false AND e.encounter_datetime >= CURRENT_DATE - INTERVAL '30 days'
+                WHERE e.voided = 0 AND e.encounter_datetime >= DATE_SUB(CURRENT_DATE, INTERVAL 30 DAY)
                 GROUP BY COALESCE(et.name, 'Unknown') ORDER BY encounter_count DESC
             """)
             add_dataset("openmrs", "hourly_visit_pattern", """
-                SELECT EXTRACT(HOUR FROM v.date_started)::int as hour_of_day,
+                SELECT HOUR(v.date_started) as hour_of_day,
                     COUNT(DISTINCT v.visit_id) as visit_count
-                FROM visit v WHERE v.voided = false AND v.date_started >= CURRENT_DATE - INTERVAL '7 days'
+                FROM visit v WHERE v.voided = 0 AND v.date_started >= DATE_SUB(CURRENT_DATE, INTERVAL 7 DAY)
                 GROUP BY 1 ORDER BY 1
             """)
 
@@ -299,7 +304,7 @@ def main():
                 JOIN drug_order dord ON o.order_id = dord.order_id
                 LEFT JOIN drug d ON dord.drug_inventory_id = d.drug_id
                 LEFT JOIN concept_name cn ON d.concept_id = cn.concept_id AND cn.locale = 'en' AND cn.concept_name_type = 'FULLY_SPECIFIED'
-                WHERE o.voided = false AND o.date_activated >= CURRENT_DATE - INTERVAL '90 days'
+                WHERE o.voided = 0 AND o.date_activated >= DATE_SUB(CURRENT_DATE, INTERVAL 90 DAY)
                 GROUP BY COALESCE(cn.name, 'Unknown') ORDER BY prescription_count DESC LIMIT 20
             """)
 
@@ -308,32 +313,37 @@ def main():
                 SELECT DATE(v.date_started) as admission_date,
                     COALESCE(vt.name, 'Unknown') as visit_type,
                     COUNT(v.visit_id) as visit_count,
-                    ROUND(AVG(EXTRACT(EPOCH FROM (v.date_stopped - v.date_started))/86400), 2) as avg_los_days
+                    ROUND(AVG(TIMESTAMPDIFF(SECOND, v.date_started, v.date_stopped) / 86400.0), 2) as avg_los_days
                 FROM visit v LEFT JOIN visit_type vt ON v.visit_type_id = vt.visit_type_id
-                WHERE v.voided = false AND v.date_stopped IS NOT NULL
-                    AND v.date_started >= CURRENT_DATE - INTERVAL '30 days'
+                WHERE v.voided = 0 AND v.date_stopped IS NOT NULL
+                    AND v.date_started >= DATE_SUB(CURRENT_DATE, INTERVAL 30 DAY)
                 GROUP BY DATE(v.date_started), COALESCE(vt.name, 'Unknown') ORDER BY admission_date DESC
             """)
             add_dataset("openmrs", "bed_occupancy", """
-                SELECT date_series::date as occupancy_date,
-                    COUNT(DISTINCT v.visit_id) as occupied_beds,
-                    ROUND(COUNT(DISTINCT v.visit_id) * 100.0 / NULLIF(50, 0), 2) as occupancy_rate
-                FROM generate_series(CURRENT_DATE - INTERVAL '30 days', CURRENT_DATE, INTERVAL '1 day') as date_series
-                LEFT JOIN visit v ON v.date_started::date <= date_series::date
-                    AND (v.date_stopped IS NULL OR v.date_stopped::date >= date_series::date) AND v.voided = false
-                GROUP BY date_series::date ORDER BY occupancy_date DESC
+                WITH RECURSIVE date_series AS (
+                    SELECT DATE_SUB(CURRENT_DATE, INTERVAL 30 DAY) AS d
+                    UNION ALL
+                    SELECT DATE_ADD(d, INTERVAL 1 DAY) FROM date_series WHERE d < CURRENT_DATE
+                )
+                SELECT ds.d AS occupancy_date,
+                    COUNT(DISTINCT v.visit_id) AS occupied_beds,
+                    ROUND(COUNT(DISTINCT v.visit_id) * 100.0 / NULLIF(50, 0), 2) AS occupancy_rate
+                FROM date_series ds
+                LEFT JOIN visit v ON DATE(v.date_started) <= ds.d
+                    AND (v.date_stopped IS NULL OR DATE(v.date_stopped) >= ds.d) AND v.voided = 0
+                GROUP BY ds.d ORDER BY occupancy_date DESC
             """)
 
             # --- PROVIDER PRODUCTIVITY ---
             add_dataset("openmrs", "provider_productivity", """
-                SELECT COALESCE(pn.given_name || ' ' || pn.family_name, 'Unknown') as provider_name,
+                SELECT COALESCE(NULLIF(TRIM(CONCAT(COALESCE(pn.given_name, ''), ' ', COALESCE(pn.family_name, ''))), ''), 'Unknown') as provider_name,
                     COUNT(DISTINCT e.encounter_id) as encounter_count,
                     COUNT(DISTINCT e.patient_id) as unique_patients
                 FROM encounter e
-                JOIN encounter_provider ep ON e.encounter_id = ep.encounter_id AND (ep.voided = false OR ep.voided IS NULL)
+                JOIN encounter_provider ep ON e.encounter_id = ep.encounter_id AND (ep.voided = 0 OR ep.voided IS NULL)
                 LEFT JOIN provider p ON ep.provider_id = p.provider_id
-                LEFT JOIN person_name pn ON p.person_id = pn.person_id AND pn.voided = false
-                WHERE e.voided = false AND e.encounter_datetime >= CURRENT_DATE - INTERVAL '30 days'
+                LEFT JOIN person_name pn ON p.person_id = pn.person_id AND pn.voided = 0
+                WHERE e.voided = 0 AND e.encounter_datetime >= DATE_SUB(CURRENT_DATE, INTERVAL 30 DAY)
                 GROUP BY pn.given_name, pn.family_name ORDER BY encounter_count DESC
             """)
 
@@ -344,7 +354,7 @@ def main():
                     COUNT(DISTINCT CASE WHEN pe.gender = 'M' THEN p.patient_id END) as male_count,
                     COUNT(DISTINCT CASE WHEN pe.gender = 'F' THEN p.patient_id END) as female_count
                 FROM patient p JOIN person pe ON p.patient_id = pe.person_id
-                WHERE p.voided = false AND p.date_created >= CURRENT_DATE - INTERVAL '90 days'
+                WHERE p.voided = 0 AND p.date_created >= DATE_SUB(CURRENT_DATE, INTERVAL 90 DAY)
                 GROUP BY DATE(p.date_created) ORDER BY registration_date DESC
             """)
             add_dataset("openmrs", "visits_summary", """
@@ -353,7 +363,7 @@ def main():
                     COUNT(DISTINCT v.visit_id) as visit_count,
                     COUNT(DISTINCT v.patient_id) as unique_patients
                 FROM visit v LEFT JOIN visit_type vt ON v.visit_type_id = vt.visit_type_id
-                WHERE v.voided = false AND v.date_started >= CURRENT_DATE - INTERVAL '90 days'
+                WHERE v.voided = 0 AND v.date_started >= DATE_SUB(CURRENT_DATE, INTERVAL 90 DAY)
                 GROUP BY DATE(v.date_started), COALESCE(vt.name, 'Unknown') ORDER BY visit_date DESC
             """)
             add_dataset("openelis", "lab_tests_daily", """

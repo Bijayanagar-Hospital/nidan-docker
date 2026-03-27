@@ -7,10 +7,10 @@ sql: |
     vt.name as visit_type,
     COUNT(DISTINCT v.visit_id) as visit_count,
     COUNT(DISTINCT v.patient_id) as unique_patients,
-    AVG(EXTRACT(EPOCH FROM (v.date_stopped - v.date_started)) / 3600) as avg_duration_hours
+    AVG(TIMESTAMPDIFF(SECOND, v.date_started, v.date_stopped) / 3600.0) as avg_duration_hours
   FROM visit v
   JOIN visit_type vt ON v.visit_type_id = vt.visit_type_id
-  WHERE v.voided = false
-    AND v.date_started >= CURRENT_DATE - INTERVAL '90 days'
+  WHERE v.voided = 0
+    AND v.date_started >= DATE_SUB(CURRENT_DATE, INTERVAL 90 DAY)
   GROUP BY DATE(v.date_started), vt.name
   ORDER BY visit_date DESC

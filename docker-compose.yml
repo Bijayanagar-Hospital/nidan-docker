@@ -105,7 +105,9 @@ services:
       start_period: 1200s
 
   openmrs-frontend:
-    # build: ./openmrs/frontend
+    build:
+      context: ./openmrs/frontend
+      dockerfile: Dockerfile
     image: trigonaltechnology/openmrs-frontend:latest
     container_name: nidan-openmrs-frontend
     environment:
@@ -452,7 +454,10 @@ services:
       - nidan-network
 
   nidan-cis:
-    image: trigonaltechnology/nidan-cis:latest
+    build:
+      context: ../nidan-middleware/integration
+      dockerfile: Dockerfile.cis
+    image: ${NIDAN_CIS_IMAGE:-trigonaltechnology/nidan-cis:latest}
     container_name: nidan-cis
     ports:
       - "${CIS_PORT:-8081}:${CIS_PORT:-8081}"
@@ -503,6 +508,13 @@ services:
       - INTEGRATION_SKIP_SOURCE_SYSTEMS=${INTEGRATION_SKIP_SOURCE_SYSTEMS:-OPENMRS}
       - RADIOLOGY_ACCESSION_PREFIX=${RADIOLOGY_ACCESSION_PREFIX:-RAD-}
       - RADIOLOGY_PROCEDURE_CODE_PREFIX=${RADIOLOGY_PROCEDURE_CODE_PREFIX:-RAD-}
+      # Per-flow toggles (integration.flows.* — see nidan-docker/env.template)
+      - INTEGRATION_FLOW_RADIOLOGY_MWL_ENABLED=${INTEGRATION_FLOW_RADIOLOGY_MWL_ENABLED:-true}
+      - INTEGRATION_FLOW_RADIOLOGY_POS_ENABLED=${INTEGRATION_FLOW_RADIOLOGY_POS_ENABLED:-true}
+      - INTEGRATION_FLOW_LAB_OPENELIS_ENABLED=${INTEGRATION_FLOW_LAB_OPENELIS_ENABLED:-true}
+      - INTEGRATION_FLOW_LAB_POS_ENABLED=${INTEGRATION_FLOW_LAB_POS_ENABLED:-true}
+      - INTEGRATION_FLOW_DEBEZIUM_PUBLISH_ORDERS_LAB_ENABLED=${INTEGRATION_FLOW_DEBEZIUM_PUBLISH_ORDERS_LAB_ENABLED:-true}
+      - INTEGRATION_FLOW_DEBEZIUM_PUBLISH_ORDERS_RADIOLOGY_ENABLED=${INTEGRATION_FLOW_DEBEZIUM_PUBLISH_ORDERS_RADIOLOGY_ENABLED:-true}
       # Debezium Embedded (CIS)--var control for debezium
       - DEBEZIUM_ENABLED=${DEBEZIUM_ENABLED:-false}
       - DEBEZIUM_DB_USER=${DEBEZIUM_DB_USER:-root}
@@ -536,7 +548,10 @@ services:
       start_period: 60s
 
   nidan-ois:
-    image: trigonaltechnology/nidan-ois:latest
+    build:
+      context: ../nidan-middleware/integration
+      dockerfile: Dockerfile.ois
+    image: ${NIDAN_OIS_IMAGE:-trigonaltechnology/nidan-ois:latest}
     container_name: nidan-ois
     ports:
       - "${OIS_PORT:-8082}:${OIS_PORT:-8082}"
@@ -561,6 +576,15 @@ services:
       - NIDAN_OIS_URL=${NIDAN_OIS_URL:-http://nidan-ois:8082}
       - NIDAN_OIS_SECRET=${NIDAN_OIS_SECRET:-sample}
       - ODOO_NIDAN_SECRET=${ODOO_NIDAN_SECRET:-sample}
+      # Align with CIS / application.yml (radiology-mwl fallback)
+      - ORTHANC_ENABLED=${ORTHANC_ENABLED:-true}
+      # Per-flow toggles (integration.flows.* — see nidan-docker/env.template)
+      - INTEGRATION_FLOW_RADIOLOGY_MWL_ENABLED=${INTEGRATION_FLOW_RADIOLOGY_MWL_ENABLED:-true}
+      - INTEGRATION_FLOW_RADIOLOGY_POS_ENABLED=${INTEGRATION_FLOW_RADIOLOGY_POS_ENABLED:-true}
+      - INTEGRATION_FLOW_LAB_OPENELIS_ENABLED=${INTEGRATION_FLOW_LAB_OPENELIS_ENABLED:-true}
+      - INTEGRATION_FLOW_LAB_POS_ENABLED=${INTEGRATION_FLOW_LAB_POS_ENABLED:-true}
+      - INTEGRATION_FLOW_DEBEZIUM_PUBLISH_ORDERS_LAB_ENABLED=${INTEGRATION_FLOW_DEBEZIUM_PUBLISH_ORDERS_LAB_ENABLED:-true}
+      - INTEGRATION_FLOW_DEBEZIUM_PUBLISH_ORDERS_RADIOLOGY_ENABLED=${INTEGRATION_FLOW_DEBEZIUM_PUBLISH_ORDERS_RADIOLOGY_ENABLED:-true}
       # Kafka retry topics (opt-in via @KafkaRetryable)
       - INTEGRATION_KAFKA_RETRY_ENABLED=${INTEGRATION_KAFKA_RETRY_ENABLED:-false}
       - INTEGRATION_KAFKA_RETRY_ATTEMPTS=${INTEGRATION_KAFKA_RETRY_ATTEMPTS:-5}
@@ -678,7 +702,7 @@ services:
   # ============================================================================
   superset:
     build: ./superset
-    image: ${SUPERSET_IMAGE:-trigonaltechnology/superset:latest}
+    # image: ${SUPERSET_IMAGE:-trigonaltechnology/superset:latest}
     container_name: nidan-superset
     ports:
       - "8088:8088"  # Keep for direct access during debugging, remove in production

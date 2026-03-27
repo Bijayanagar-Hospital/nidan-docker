@@ -7,10 +7,10 @@ sql: |
     COUNT(DISTINCT p.patient_id) as patient_count,
     COUNT(DISTINCT CASE WHEN pe.gender = 'M' THEN p.patient_id END) as male_count,
     COUNT(DISTINCT CASE WHEN pe.gender = 'F' THEN p.patient_id END) as female_count,
-    AVG(EXTRACT(YEAR FROM AGE(pe.birthdate))) as avg_age
+    AVG(TIMESTAMPDIFF(YEAR, pe.birthdate, CURDATE())) as avg_age
   FROM patient p
   JOIN person pe ON p.patient_id = pe.person_id
-  WHERE p.voided = false
-    AND p.date_created >= CURRENT_DATE - INTERVAL '90 days'
+  WHERE p.voided = 0
+    AND p.date_created >= DATE_SUB(CURRENT_DATE, INTERVAL 90 DAY)
   GROUP BY DATE(p.date_created)
   ORDER BY registration_date DESC
