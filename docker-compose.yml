@@ -453,14 +453,22 @@ services:
     networks:
       - nidan-network
 
+  # CIS / OIS: build from ../nidan-middleware/integration (Maven runs in Docker).
+  #   docker compose build nidan-cis nidan-ois
+  #   docker compose up --build nidan-cis nidan-ois
+  # Set NIDAN_CIS_IMAGE / NIDAN_OIS_IMAGE to registry tags to use prebuilt images without local build.
   nidan-cis:
     build:
       context: ../nidan-middleware/integration
       dockerfile: Dockerfile.cis
-    image: ${NIDAN_CIS_IMAGE:-trigonaltechnology/nidan-cis:latest}
+    image: ${NIDAN_CIS_IMAGE:-nidan-cis:local}
     container_name: nidan-cis
     ports:
       - "${CIS_PORT:-8081}:${CIS_PORT:-8081}"
+    # Share MWL directory with Orthanc (same host path as orthanc service worklists volume)
+    volumes:
+      # Must match Orthanc container worklist path (see orthanc service volume)
+      - ./orthanc/worklists:/var/lib/orthanc/worklists
 
     # To call an EXTERNAL HTTPS OpenELIS :
     # 1) Map the ELIS hostname to your ELIS IP
@@ -494,6 +502,14 @@ services:
       - ORTHANC_USERNAME=${ORTHANC_USERNAME:-orthanc}
       - ORTHANC_PASSWORD=${ORTHANC_PASSWORD:-orthanc}
       - ORTHANC_DICOM_UID_ROOT=${ORTHANC_DICOM_UID_ROOT:-1.2.840.10008}
+      - ORTHANC_WORKLIST_DIR=${ORTHANC_WORKLIST_DIR:-/var/lib/orthanc/worklists}
+      - DICOM_TYPE=${DICOM_TYPE:-orthanc}
+      # Match OpenMRS order_type.order_type_id for imaging orders (sql: select * from order_type where name like '%radio%';)
+      - OPENMRS_ORDER_TYPE_RADIOLOGY=${OPENMRS_ORDER_TYPE_RADIOLOGY:-11}
+      - OPENMRS_ORDER_TYPE_DRUG=${OPENMRS_ORDER_TYPE_DRUG:-2}
+      - OPENMRS_ORDER_TYPE_LAB=${OPENMRS_ORDER_TYPE_LAB:-3}
+      - OPENMRS_ORDER_TYPE_PROCEDURE=${OPENMRS_ORDER_TYPE_PROCEDURE:-4}
+      - OPENMRS_ORDER_TYPE_MEDICAL_SUPPLY=${OPENMRS_ORDER_TYPE_MEDICAL_SUPPLY:-5}
       # OpenELIS
       - OPENELIS_ENABLED=${OPENELIS_ENABLED:-false}
       - OPENELIS_BASE_URL=${OPENELIS_BASE_URL:-http://openelis:8080/OpenELIS-Global/rest}
@@ -551,7 +567,7 @@ services:
     build:
       context: ../nidan-middleware/integration
       dockerfile: Dockerfile.ois
-    image: ${NIDAN_OIS_IMAGE:-trigonaltechnology/nidan-ois:latest}
+    image: ${NIDAN_OIS_IMAGE:-nidan-ois:local}
     container_name: nidan-ois
     ports:
       - "${OIS_PORT:-8082}:${OIS_PORT:-8082}"
