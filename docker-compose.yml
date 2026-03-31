@@ -105,9 +105,9 @@ services:
       start_period: 1200s
 
   openmrs-frontend:
-    build:
-      context: ./openmrs/frontend
-      dockerfile: Dockerfile
+    # build:
+    #   context: ./openmrs/frontend
+    #   dockerfile: Dockerfile
     image: trigonaltechnology/openmrs-frontend:latest
     container_name: nidan-openmrs-frontend
     environment:
@@ -274,6 +274,9 @@ services:
       # Authentication (dynamic/secrets)
       ORTHANC__REGISTERED_USERS: |
         {"${ORTHANC_USERNAME:-nidan}": "${ORTHANC_PASSWORD:-nidan}"}
+      # Exposed for healthchecks / operators (Orthanc reads ORTHANC__* for config)
+      ORTHANC_USERNAME: "${ORTHANC_USERNAME:-nidan}"
+      ORTHANC_PASSWORD: "${ORTHANC_PASSWORD:-nidan}"
       # Dynamic Webhook to CIS
       ORTHANC_WEBHOOK_URL: "http://${CIS_HOST:-nidan-cis}:${CIS_PORT:-8081}/orthanc/webhook"
     networks:
@@ -287,6 +290,7 @@ services:
       # Worklist directory for MWL plugin
       - ./orthanc/worklists:/var/lib/orthanc/worklists
     healthcheck:
+      # TCP-only check: "healthy" means port listens, not that the UI loaded (UI needs HTTP Basic auth).
       test: [ "CMD", "python3", "-c", "import socket; s = socket.socket(socket.AF_INET, socket.SOCK_STREAM); s.settimeout(1); s.connect(('127.0.0.1', 8042))" ]
       interval: 30s
       timeout: 10s
@@ -504,12 +508,13 @@ services:
       - ORTHANC_DICOM_UID_ROOT=${ORTHANC_DICOM_UID_ROOT:-1.2.840.10008}
       - ORTHANC_WORKLIST_DIR=${ORTHANC_WORKLIST_DIR:-/var/lib/orthanc/worklists}
       - DICOM_TYPE=${DICOM_TYPE:-orthanc}
-      # Match OpenMRS order_type.order_type_id for imaging orders (sql: select * from order_type where name like '%radio%';)
-      - OPENMRS_ORDER_TYPE_RADIOLOGY=${OPENMRS_ORDER_TYPE_RADIOLOGY:-11}
-      - OPENMRS_ORDER_TYPE_DRUG=${OPENMRS_ORDER_TYPE_DRUG:-2}
-      - OPENMRS_ORDER_TYPE_LAB=${OPENMRS_ORDER_TYPE_LAB:-3}
-      - OPENMRS_ORDER_TYPE_PROCEDURE=${OPENMRS_ORDER_TYPE_PROCEDURE:-4}
-      - OPENMRS_ORDER_TYPE_MEDICAL_SUPPLY=${OPENMRS_ORDER_TYPE_MEDICAL_SUPPLY:-5}
+      # Order type UUIDs (Initializer ordertypes.csv); CIS resolves to order_type_id at startup
+      - OPENMRS_ORDER_TYPE_UUID_DRUG=${OPENMRS_ORDER_TYPE_UUID_DRUG:-131168f4-15f5-102d-96e4-000c29c2a5d7}
+      - OPENMRS_ORDER_TYPE_UUID_LAB=${OPENMRS_ORDER_TYPE_UUID_LAB:-52a447d3-a64a-11e3-9aeb-50e549534c5e}
+      - OPENMRS_ORDER_TYPE_UUID_RADIOLOGY=${OPENMRS_ORDER_TYPE_UUID_RADIOLOGY:-c19c8e82-8b8d-4b4e-b1ff-3f09890b2db3}
+      - OPENMRS_ORDER_TYPE_UUID_PROCEDURE=${OPENMRS_ORDER_TYPE_UUID_PROCEDURE:-4237a01f-29c5-4167-9d8e-96d6e590aa33}
+      - OPENMRS_ORDER_TYPE_UUID_MEDICAL_SUPPLY=${OPENMRS_ORDER_TYPE_UUID_MEDICAL_SUPPLY:-dab3ab30-2feb-48ec-b4af-8332a0831b49}
+      - OPENMRS_ORDER_TYPE_UUID_BED=${OPENMRS_ORDER_TYPE_UUID_BED:-}
       # OpenELIS
       - OPENELIS_ENABLED=${OPENELIS_ENABLED:-false}
       - OPENELIS_BASE_URL=${OPENELIS_BASE_URL:-http://openelis:8080/OpenELIS-Global/rest}
@@ -584,8 +589,6 @@ services:
       - ODOO_DATABASE=${ODOO_DB_NAME:-nidan}
       - ODOO_USERNAME=${ODOO_USERNAME:-nidan}
       - ODOO_PASSWORD=${ODOO_PASSWORD:-nidan}
-      - ODOO_POS_ORDER_REF_PREFIX=${ODOO_POS_ORDER_REF_PREFIX:-RAD-}
-      - ODOO_POS_DEFAULT_RADIOLOGY_PRODUCT_ID=${ODOO_POS_DEFAULT_RADIOLOGY_PRODUCT_ID:-1}
       # Integration
       - OIS_WEBHOOK_SECRET=${OIS_WEBHOOK_SECRET:-sample}
       - SKIP_SOURCE_SYSTEMS_FOR_ODOO=${SKIP_SOURCE_SYSTEMS_FOR_ODOO:-ODOO}

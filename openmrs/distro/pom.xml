@@ -32,7 +32,8 @@
         <addresshierarchy.version>2.21.0</addresshierarchy.version>
         <patientdocuments.version>1.0.0</patientdocuments.version>
         <idgen.version>5.0.4</idgen.version>
-        <legacyui.version>2.0.0</legacyui.version>
+        <!-- legacyui: Nidan OMOD is copied from custom_modules/ (e.g. legacyui-2.0.1-nidan-SNAPSHOT.omod), not resolved from Maven -->
+        <!-- <legacyui.version>2.0.1-nidan-SNAPSHOT</legacyui.version> -->
         <metadatamapping.version>2.0.0</metadatamapping.version>
         <openconceptlab.version>3.0.0</openconceptlab.version>
         <!-- attachments provided by custom_modules/ (Nidan SNAPSHOT) -->
@@ -117,12 +118,15 @@
             <version>${idgen.version}</version>
             <scope>provided</scope>
         </dependency>
+        <!-- legacyui is provided by custom_modules/ — comment out to avoid Maven resolution (artifact is not published) -->
+        <!--
         <dependency>
             <groupId>org.openmrs.module</groupId>
             <artifactId>legacyui-omod</artifactId>
             <version>${legacyui.version}</version>
             <scope>provided</scope>
         </dependency>
+        -->
         <dependency>
             <groupId>org.openmrs.module</groupId>
             <artifactId>addresshierarchy-omod</artifactId>

@@ -269,6 +269,8 @@ services:
       # Authentication (dynamic/secrets)
       ORTHANC__REGISTERED_USERS: |
         {"${ORTHANC_USERNAME:-nidan}": "${ORTHANC_PASSWORD:-nidan}"}
+      ORTHANC_USERNAME: "${ORTHANC_USERNAME:-nidan}"
+      ORTHANC_PASSWORD: "${ORTHANC_PASSWORD:-nidan}"
     networks:
       - nidan-network
     depends_on:
@@ -280,7 +282,8 @@ services:
       # Worklist directory for MWL plugin
       - ./orthanc/worklists:/var/lib/orthanc/worklists
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8042/system" ]
+      # AuthenticationEnabled in orthanc.json — /system needs Basic auth (same as the browser UI).
+      test: [ "CMD-SHELL", "curl -sf -u \"$ORTHANC_USERNAME:$ORTHANC_PASSWORD\" http://127.0.0.1:8042/system -o /dev/null" ]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -559,8 +562,6 @@ services:
       - NIDAN_OIS_URL=${NIDAN_OIS_URL:-http://nidan-ois:8082}
       - NIDAN_OIS_SECRET=${NIDAN_OIS_SECRET:-nidan-secret-password}
       - ODOO_PASSWORD=${ODOO_PASSWORD:-nidan}
-      - ODOO_POS_ORDER_REF_PREFIX=${ODOO_POS_ORDER_REF_PREFIX:-RAD-}
-      - ODOO_POS_DEFAULT_RADIOLOGY_PRODUCT_ID=${ODOO_POS_DEFAULT_RADIOLOGY_PRODUCT_ID:-1}
       # Integration
       - OIS_WEBHOOK_SECRET=${NIDAN_OIS_SECRET:-nidan-secret-password}
       - SKIP_SOURCE_SYSTEMS_FOR_ODOO=${SKIP_SOURCE_SYSTEMS_FOR_ODOO:-ODOO}

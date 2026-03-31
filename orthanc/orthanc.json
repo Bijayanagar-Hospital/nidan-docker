@@ -1,5 +1,6 @@
 {
     "Name": "Nidan Orthanc",
+    "Plugins": [ "/usr/share/orthanc/plugins" ],
     "DicomServerEnabled": true,
     "DicomPort": 4242,
     "DicomAet": "NIDAN_ORTHANC",
