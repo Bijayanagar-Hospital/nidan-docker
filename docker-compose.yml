@@ -64,7 +64,8 @@ services:
   # # ============================================================================
   openmrs-backend:
     # build: ./openmrs
-    image: trigonaltechnology/openmrs-backend:latest
+    # image: trigonaltechnology/openmrs-backend:latest
+    image: openmrs-backend:local
     # user: root
     container_name: nidan-openmrs-backend
     environment:
