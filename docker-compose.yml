@@ -720,7 +720,7 @@ services:
   # ============================================================================
   superset:
     build: ./superset
-    # image: ${SUPERSET_IMAGE:-trigonaltechnology/superset:latest}
+    image: ${SUPERSET_IMAGE:-trigonaltechnology/superset:latest}
     container_name: nidan-superset
     ports:
       - "8088:8088"  # Keep for direct access during debugging, remove in production
