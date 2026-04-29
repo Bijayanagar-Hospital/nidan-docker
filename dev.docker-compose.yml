@@ -118,7 +118,7 @@ services:
     container_name: nidan-openmrs-db
     #command: "mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci --sql-mode=''"
     # Configure MariaDB with utf8mb4 and row‑based binlog (unique server-id, relaxed SQL mode) for Debezium/OpenMRS CDC --do the same if running external
-    command: "mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci --sql-mode='' --server-id=2749 --log-bin=mysql-bin --binlog_format=ROW --binlog_row_image=FULL"
+    command: "mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci --sql-mode='' --server-id=2749 --log-bin=mysql-bin --binlog_format=ROW --binlog_row_image=FULL --max-allowed-packet=256M"
     healthcheck:
       test: "mysql --user=${OPENMRS_DB_USER:-openmrs} --password=${OPENMRS_DB_PASSWORD:-openmrs} --execute \"SHOW DATABASES;\""
       interval: 3s
@@ -475,6 +475,7 @@ services:
       - INTEGRATION_DB_URL=jdbc:postgresql://${INTEGRATION_DB_HOST:-nidan-integration-db}:${INTEGRATION_DB_PORT:-5432}/${INTEGRATION_DB_NAME:-nidan_integration}
       - INTEGRATION_DB_USER=${INTEGRATION_DB_USER:-nidan}
       - INTEGRATION_DB_PASSWORD=${INTEGRATION_DB_PASSWORD:-nidan}
+      - MANAGEMENT_HEALTH_REDIS_ENABLED=${MANAGEMENT_HEALTH_REDIS_ENABLED:-false}
       # OpenMRS database (used by Debezium)
       - OPENMRS_DB_HOST=${OPENMRS_DB_HOST:-openmrs-db}
       - OPENMRS_DB_PORT=${OPENMRS_DB_PORT:-3306}
@@ -525,6 +526,8 @@ services:
         condition: service_healthy
       nidan-kafka:
         condition: service_started
+      openmrs-db:
+        condition: service_healthy
       openmrs-backend:
         condition: service_healthy
       # Orthanc dependency made optional - CIS can start without it if radiology is disabled
@@ -552,6 +555,7 @@ services:
       - INTEGRATION_DB_URL=jdbc:postgresql://${INTEGRATION_DB_HOST:-nidan-integration-db}:${INTEGRATION_DB_PORT:-5432}/${INTEGRATION_DB_NAME:-nidan_integration}
       - INTEGRATION_DB_USER=${INTEGRATION_DB_USER:-nidan}
       - INTEGRATION_DB_PASSWORD=${INTEGRATION_DB_PASSWORD:-nidan}
+      - MANAGEMENT_HEALTH_REDIS_ENABLED=${MANAGEMENT_HEALTH_REDIS_ENABLED:-false}
       # Kafka
       - KAFKA_BOOTSTRAP_SERVERS=nidan-kafka:${KAFKA_PORT:-9092}
       - OIS_KAFKA_GROUP_ID=${OIS_KAFKA_GROUP_ID:-nidan-ois}
