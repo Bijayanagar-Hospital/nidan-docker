@@ -433,21 +433,42 @@ def main():
                 dataset = datasets.get(table_name)
                 if not dataset:
                     return None
+                    
+                # Auto-upgrade legacy charts to modern ECharts
+                if viz_type in ("bar", "dist_bar"):
+                    viz_type = "echarts_timeseries_bar"
+                    if "groupby" in params and params["groupby"]:
+                        params["x_axis"] = params["groupby"][0]
+                        params["groupby"] = []
+                elif viz_type in ("pie", "echarts_pie"):
+                    viz_type = "pie"
+                    # ECharts pie uses 'metric' (singular object) instead of 'metrics' (array)
+                    if "metrics" in params and isinstance(params["metrics"], list) and len(params["metrics"]) > 0:
+                        params["metric"] = params["metrics"][0]
+                        del params["metrics"]
+                    
                 existing = db.session.query(Slice).filter_by(slice_name=slice_name, datasource_id=dataset.id).first()
                 if existing:
                     print(f"  ✓ Chart '{slice_name}' already exists")
-                    # Fix legacy pie charts that cause "label" undefined errors
-                    if existing.viz_type == "pie" and viz_type == "echarts_pie":
+                    needs_update = False
+                    
+                    if existing.viz_type != viz_type or existing.viz_type in ("bar", "dist_bar", "pie"):
                         existing.viz_type = viz_type
+                        needs_update = True
+                        
+                    current_params = existing.params or "{}"
+                    try:
+                        if json.loads(current_params) != params:
+                            existing.params = json.dumps(params)
+                            needs_update = True
+                    except Exception:
                         existing.params = json.dumps(params)
+                        needs_update = True
+                        
+                    if needs_update:
                         db.session.commit()
-                        print(f"    → Updated to echarts_pie (fixes label error)")
-                    # Fix Hourly Visit Pattern: echarts_timeseries needs datetime, hour_of_day is int -> use bar
-                    elif slice_name == "Hourly Visit Pattern" and existing.viz_type == "echarts_timeseries":
-                        existing.viz_type = viz_type
-                        existing.params = json.dumps(params)
-                        db.session.commit()
-                        print(f"    → Updated to bar (hour_of_day is not datetime)")
+                        print(f"    → Updated chart to {viz_type} and applied params")
+                        
                     charts[slice_name] = existing
                     return existing
                 try:
@@ -474,19 +495,25 @@ def main():
                 "metrics": [{"expressionType": "SIMPLE", "column": {"column_name": "patient_count"}, "aggregate": "SUM", "label": "Patients"}],
                 "groupby": [],
             })
-            add_chart("patient_demographics", "Patient Gender Distribution", "echarts_pie", {
+            add_chart("patient_demographics", "Patient Gender Distribution", "pie", {
                 "metrics": [{"expressionType": "SIMPLE", "column": {"column_name": "patient_count"}, "aggregate": "SUM", "label": "Count"}],
                 "groupby": ["gender"],
+                "adhoc_filters": [],
+                "row_limit": 10000,
+                "show_legend": True,
+                "legend_type": "scroll",
             })
-            add_chart("patient_demographics", "Patient Age Distribution", "bar", {
+            add_chart("patient_demographics", "Patient Age Distribution", "dist_bar", {
                 "metrics": [{"expressionType": "SIMPLE", "column": {"column_name": "patient_count"}, "aggregate": "SUM", "label": "Count"}],
                 "groupby": ["age_group"],
+                "adhoc_filters": [],
+                "row_limit": 10000,
             })
-            add_chart("patient_location_distribution", "Geographic Distribution", "bar", {
+            add_chart("patient_location_distribution", "Geographic Distribution", "dist_bar", {
                 "metrics": [{"expressionType": "SIMPLE", "column": {"column_name": "patient_count"}, "aggregate": "SUM", "label": "Count"}],
                 "groupby": ["location"],
             })
-            add_chart("visit_statistics", "Visits by Type", "echarts_pie", {
+            add_chart("visit_statistics", "Visits by Type", "pie", {
                 "metrics": [{"expressionType": "SIMPLE", "column": {"column_name": "visit_count"}, "aggregate": "SUM", "label": "Visits"}],
                 "groupby": ["visit_type"],
             })
@@ -495,11 +522,11 @@ def main():
                 "metrics": [{"expressionType": "SIMPLE", "column": {"column_name": "inpatient_count"}, "aggregate": "SUM", "label": "Patients"}],
                 "groupby": [],
             })
-            add_chart("encounter_types_distribution", "Encounter Types", "bar", {
+            add_chart("encounter_types_distribution", "Encounter Types", "dist_bar", {
                 "metrics": [{"expressionType": "SIMPLE", "column": {"column_name": "encounter_count"}, "aggregate": "SUM", "label": "Count"}],
                 "groupby": ["encounter_type"],
             })
-            add_chart("hourly_visit_pattern", "Hourly Visit Pattern", "bar", {
+            add_chart("hourly_visit_pattern", "Hourly Visit Pattern", "dist_bar", {
                 "metrics": [{"expressionType": "SIMPLE", "column": {"column_name": "visit_count"}, "aggregate": "SUM", "label": "Visits"}],
                 "groupby": ["hour_of_day"],
             })
@@ -518,24 +545,23 @@ def main():
                 "metrics": [{"expressionType": "SIMPLE", "column": {"column_name": "total_revenue"}, "aggregate": "SUM", "label": "Revenue"}],
                 "groupby": [],
             })
-            add_chart("revenue_by_service", "Revenue by Service", "bar", {
+            add_chart("revenue_by_service", "Revenue by Service", "dist_bar", {
                 "metrics": [{"expressionType": "SIMPLE", "column": {"column_name": "revenue"}, "aggregate": "SUM", "label": "Revenue"}],
                 "groupby": ["service_category"],
             })
-            add_chart("outstanding_invoices", "Outstanding Invoices Aging", "bar", {
+            add_chart("outstanding_invoices", "Outstanding Invoices Aging", "dist_bar", {
                 "metrics": [{"expressionType": "SIMPLE", "column": {"column_name": "outstanding_amount"}, "aggregate": "SUM", "label": "Amount"}],
                 "groupby": ["aging_bucket"],
             })
-            add_chart("top_prescribed_drugs", "Top Prescribed Drugs", "bar", {
+            add_chart("top_prescribed_drugs", "Top Prescribed Drugs", "dist_bar", {
                 "metrics": [{"expressionType": "SIMPLE", "column": {"column_name": "prescription_count"}, "aggregate": "SUM", "label": "Count"}],
                 "groupby": ["drug_name"],
             })
             add_chart("near_expiry_medicines", "Near Expiry Medicines", "table", {
                 "all_columns": ["drug_name", "lot_number", "expiration_date", "days_until_expiry", "quantity"],
-                "order_by_cols": [["expiration_date", True]],
                 "row_limit": 50,
             })
-            add_chart("low_stock_drugs", "Low Stock Drugs", "bar", {
+            add_chart("low_stock_drugs", "Low Stock Drugs", "dist_bar", {
                 "metrics": [{"expressionType": "SIMPLE", "column": {"column_name": "quantity_on_hand"}, "aggregate": "SUM", "label": "Qty"}],
                 "groupby": ["drug_name"],
             })
@@ -549,7 +575,7 @@ def main():
                 "metrics": [{"expressionType": "SIMPLE", "column": {"column_name": "occupancy_rate"}, "aggregate": "AVG", "label": "Rate"}],
                 "groupby": [],
             })
-            add_chart("provider_productivity", "Provider Productivity", "bar", {
+            add_chart("provider_productivity", "Provider Productivity", "dist_bar", {
                 "metrics": [{"expressionType": "SIMPLE", "column": {"column_name": "encounter_count"}, "aggregate": "SUM", "label": "Encounters"}],
                 "groupby": ["provider_name"],
             })
@@ -559,7 +585,7 @@ def main():
                 "metrics": [{"expressionType": "SIMPLE", "column": {"column_name": "patient_count"}, "aggregate": "SUM", "label": "Patients"}],
                 "groupby": [],
             })
-            add_chart("visits_summary", "Visits Summary", "echarts_pie", {
+            add_chart("visits_summary", "Visits Summary", "pie", {
                 "metrics": [{"expressionType": "SIMPLE", "column": {"column_name": "visit_count"}, "aggregate": "SUM", "label": "Visits"}],
                 "groupby": ["visit_type"],
             })

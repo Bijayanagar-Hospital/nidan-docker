@@ -1,0 +1,1725 @@
+# DHIS2 Mapping Template  (v2)
+# Generated : 2026-04-29 13:16:24
+# Dataset   : 01-3 Hospital Indoor Service (NEW)
+# Grouping  : name-pattern auto-grouping (6 groups)
+#
+# NEXT STEPS:
+#   1. Set org_unit_id to your facility's DHIS2 org unit UID
+#   2. For each query block, confirm or adjust sql_file path
+#   3. Set 'key' to the SQL column name for each mapping
+#      Leave 'key' empty to skip that field
+
+dataset_id:   "wFShrjdBjpR"
+dataset_name: "01-3 Hospital Indoor Service (NEW)"
+period_type:  Monthly
+org_unit_id:  "mPO6LgjseUd"  # ← FILL THIS IN
+
+sync_schedule:    monthly   # monthly | quarterly | 'cron: 0 2 1 * *'
+sync_offset_days: 0         # days before period end to trigger sync
+
+targets:
+  - federal_hmis
+
+queries:
+  # SQL parameters available: :start_date  :end_date
+
+  # ──────────────────────────────────────────────────────
+  - name:     "Inpatient"
+    sql_file: "sql/01_3_hospital_indoor_service_new/inpatient.sql"
+    optional: false
+    mappings:
+
+      # Inpatients Recovered/Cured- Age Group 29 Days - 1 Year
+      - key: "v_1_year_f"  # ← SQL column for: Female
+        dataElement: "VT7pxUmkCk4"
+        dataElementName: "Inpatients Recovered/Cured- Age Group 29 Days - 1 Year"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_1_year_m"  # ← SQL column for: Male
+        dataElement: "VT7pxUmkCk4"
+        dataElementName: "Inpatients Recovered/Cured- Age Group 29 Days - 1 Year"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatient Deaths in ≥ 48 Hours of Admission-  ≥ 70 Years
+      - key: "v_70_years_f"  # ← SQL column for: Female
+        dataElement: "UBWw7aps69k"
+        dataElementName: "Inpatient Deaths in ≥ 48 Hours of Admission-  ≥ 70 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_70_years_m"  # ← SQL column for: Male
+        dataElement: "UBWw7aps69k"
+        dataElementName: "Inpatient Deaths in ≥ 48 Hours of Admission-  ≥ 70 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatients Outcome-DOPR/LAMA-8 to 28 days
+      - key: "v_8_to_28_days_f"  # ← SQL column for: Female
+        dataElement: "tJPTannLCpR"
+        dataElementName: "Inpatients Outcome-DOPR/LAMA-8 to 28 days"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_8_to_28_days_m"  # ← SQL column for: Male
+        dataElement: "tJPTannLCpR"
+        dataElementName: "Inpatients Outcome-DOPR/LAMA-8 to 28 days"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatient Deaths in < 48 Hours of Admission- Age Group 30 - 39 Years
+      - key: "v_39_years_f"  # ← SQL column for: Female
+        dataElement: "r5ovXqoUemk"
+        dataElementName: "Inpatient Deaths in < 48 Hours of Admission- Age Group 30 - 39 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_39_years_m"  # ← SQL column for: Male
+        dataElement: "r5ovXqoUemk"
+        dataElementName: "Inpatient Deaths in < 48 Hours of Admission- Age Group 30 - 39 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatient- Deaths in Inpatient
+      - key: "deaths_in_inpatient_f"  # ← SQL column for: Female
+        dataElement: "zyYi2g0sMwN"
+        dataElementName: "Inpatient- Deaths in Inpatient"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "deaths_in_inpatient_m"  # ← SQL column for: Male
+        dataElement: "zyYi2g0sMwN"
+        dataElementName: "Inpatient- Deaths in Inpatient"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatient Deaths in < 48 Hours of Admission- Age Group 05 - 14 Years
+      - key: "v_14_years_f"  # ← SQL column for: Female
+        dataElement: "RZxcXR28SV3"
+        dataElementName: "Inpatient Deaths in < 48 Hours of Admission- Age Group 05 - 14 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_14_years_m"  # ← SQL column for: Male
+        dataElement: "RZxcXR28SV3"
+        dataElementName: "Inpatient Deaths in < 48 Hours of Admission- Age Group 05 - 14 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatient Deaths in ≥ 48 Hours of Admission- Age Group 50 - 59 Years
+      - key: "v_59_years_f"  # ← SQL column for: Female
+        dataElement: "q9HWBr7XI3j"
+        dataElementName: "Inpatient Deaths in ≥ 48 Hours of Admission- Age Group 50 - 59 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_59_years_m"  # ← SQL column for: Male
+        dataElement: "q9HWBr7XI3j"
+        dataElementName: "Inpatient Deaths in ≥ 48 Hours of Admission- Age Group 50 - 59 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatients Absconded- Age Group 50 - 59 Years
+      - key: "v_59_years_f_2"  # ← SQL column for: Female
+        dataElement: "rvi6BdbtIu1"
+        dataElementName: "Inpatients Absconded- Age Group 50 - 59 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_59_years_m_2"  # ← SQL column for: Male
+        dataElement: "rvi6BdbtIu1"
+        dataElementName: "Inpatients Absconded- Age Group 50 - 59 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatients Recovered/Cured- Age Group 05 - 14 Years
+      - key: "v_14_years_f_2"  # ← SQL column for: Female
+        dataElement: "idfm34Azg6Q"
+        dataElementName: "Inpatients Recovered/Cured- Age Group 05 - 14 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_14_years_m_2"  # ← SQL column for: Male
+        dataElement: "idfm34Azg6Q"
+        dataElementName: "Inpatients Recovered/Cured- Age Group 05 - 14 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatients Outcome-Stable-15 to 19 Year
+      - key: "v_15_to_19_year_f"  # ← SQL column for: Female
+        dataElement: "QnPXOhBy2L0"
+        dataElementName: "Inpatients Outcome-Stable-15 to 19 Year"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_15_to_19_year_m"  # ← SQL column for: Male
+        dataElement: "QnPXOhBy2L0"
+        dataElementName: "Inpatients Outcome-Stable-15 to 19 Year"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatient Reported DOR/LAMA/DAMA- Age Group 40 - 49 Years
+      - key: "v_49_years_f"  # ← SQL column for: Female
+        dataElement: "MzCbP9IShpH"
+        dataElementName: "Inpatient Reported DOR/LAMA/DAMA- Age Group 40 - 49 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_49_years_m"  # ← SQL column for: Male
+        dataElement: "MzCbP9IShpH"
+        dataElementName: "Inpatient Reported DOR/LAMA/DAMA- Age Group 40 - 49 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatient-Intermediate surgeries in Inpatient
+      - key: "intermediate_surgeries_in_inpatient_f"  # ← SQL column for: Female
+        dataElement: "jiDCdaL2uK8"
+        dataElementName: "Inpatient-Intermediate surgeries in Inpatient"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "intermediate_surgeries_in_inpatient_m"  # ← SQL column for: Male
+        dataElement: "jiDCdaL2uK8"
+        dataElementName: "Inpatient-Intermediate surgeries in Inpatient"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatients Referred Out- Age Group 40 - 49 Years
+      - key: "v_49_years_f_2"  # ← SQL column for: Female
+        dataElement: "jSCf0lQ0CKP"
+        dataElementName: "Inpatients Referred Out- Age Group 40 - 49 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_49_years_m_2"  # ← SQL column for: Male
+        dataElement: "jSCf0lQ0CKP"
+        dataElementName: "Inpatients Referred Out- Age Group 40 - 49 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatients Absconded- Age Group 30 - 39 Years
+      - key: "v_39_years_f_2"  # ← SQL column for: Female
+        dataElement: "xOBWxJ7rtOG"
+        dataElementName: "Inpatients Absconded- Age Group 30 - 39 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_39_years_m_2"  # ← SQL column for: Male
+        dataElement: "xOBWxJ7rtOG"
+        dataElementName: "Inpatients Absconded- Age Group 30 - 39 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatients Recovered/Cured- Age Group 20 - 29 Years
+      - key: "v_29_years_f"  # ← SQL column for: Female
+        dataElement: "eWZ03zEBkBX"
+        dataElementName: "Inpatients Recovered/Cured- Age Group 20 - 29 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_29_years_m"  # ← SQL column for: Male
+        dataElement: "eWZ03zEBkBX"
+        dataElementName: "Inpatients Recovered/Cured- Age Group 20 - 29 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatients Recovered/Cured- Age Group 15 - 19 Years
+      - key: "v_19_years_f"  # ← SQL column for: Female
+        dataElement: "jeODCTX57ty"
+        dataElementName: "Inpatients Recovered/Cured- Age Group 15 - 19 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_19_years_m"  # ← SQL column for: Male
+        dataElement: "jeODCTX57ty"
+        dataElementName: "Inpatients Recovered/Cured- Age Group 15 - 19 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatients Recovered/Cured- Age Group 50 - 59 Years
+      - key: "v_59_years_f_3"  # ← SQL column for: Female
+        dataElement: "XgqSseUwYwV"
+        dataElementName: "Inpatients Recovered/Cured- Age Group 50 - 59 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_59_years_m_3"  # ← SQL column for: Male
+        dataElement: "XgqSseUwYwV"
+        dataElementName: "Inpatients Recovered/Cured- Age Group 50 - 59 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatients Outcome-Stable->= 70 Year
+      - key: "v_70_year_f"  # ← SQL column for: Female
+        dataElement: "Z4zwE88awmI"
+        dataElementName: "Inpatients Outcome-Stable->= 70 Year"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_70_year_m"  # ← SQL column for: Male
+        dataElement: "Z4zwE88awmI"
+        dataElementName: "Inpatients Outcome-Stable->= 70 Year"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatient-Medico-legal Cases
+      - key: "legal_cases_f"  # ← SQL column for: Female
+        dataElement: "cvruy1B1fIf"
+        dataElementName: "Inpatient-Medico-legal Cases"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "legal_cases_m"  # ← SQL column for: Male
+        dataElement: "cvruy1B1fIf"
+        dataElementName: "Inpatient-Medico-legal Cases"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatient- Deaths in Emergency
+      - key: "deaths_in_emergency_f"  # ← SQL column for: Female
+        dataElement: "E71fixytlb4"
+        dataElementName: "Inpatient- Deaths in Emergency"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "deaths_in_emergency_m"  # ← SQL column for: Male
+        dataElement: "E71fixytlb4"
+        dataElementName: "Inpatient- Deaths in Emergency"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatient Reported DOR/LAMA/DAMA- Age Group 01 - 04 Years
+      - key: "v_04_years_f"  # ← SQL column for: Female
+        dataElement: "uHC49o0YWzj"
+        dataElementName: "Inpatient Reported DOR/LAMA/DAMA- Age Group 01 - 04 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_04_years_m"  # ← SQL column for: Male
+        dataElement: "uHC49o0YWzj"
+        dataElementName: "Inpatient Reported DOR/LAMA/DAMA- Age Group 01 - 04 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatient Deaths in ≥ 48 Hours of Admission- Age Group 30 - 39 Years
+      - key: "v_39_years_f_3"  # ← SQL column for: Female
+        dataElement: "UAbEC9wm8JC"
+        dataElementName: "Inpatient Deaths in ≥ 48 Hours of Admission- Age Group 30 - 39 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_39_years_m_3"  # ← SQL column for: Male
+        dataElement: "UAbEC9wm8JC"
+        dataElementName: "Inpatient Deaths in ≥ 48 Hours of Admission- Age Group 30 - 39 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatient Deaths in < 48 Hours of Admission- Age Group 01 - 04 Years
+      - key: "v_04_years_f_2"  # ← SQL column for: Female
+        dataElement: "y9WZpRQwfwP"
+        dataElementName: "Inpatient Deaths in < 48 Hours of Admission- Age Group 01 - 04 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_04_years_m_2"  # ← SQL column for: Male
+        dataElement: "y9WZpRQwfwP"
+        dataElementName: "Inpatient Deaths in < 48 Hours of Admission- Age Group 01 - 04 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatient Deaths in ≥ 48 Hours of Admission- Age Group 20 - 29 Years
+      - key: "v_29_years_f_2"  # ← SQL column for: Female
+        dataElement: "qNch4vXPvMS"
+        dataElementName: "Inpatient Deaths in ≥ 48 Hours of Admission- Age Group 20 - 29 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_29_years_m_2"  # ← SQL column for: Male
+        dataElement: "qNch4vXPvMS"
+        dataElementName: "Inpatient Deaths in ≥ 48 Hours of Admission- Age Group 20 - 29 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Major Surgeries Done in Inpatient
+      - key: "major_surgeries_done_in_inpatient_f"  # ← SQL column for: Female
+        dataElement: "npj4tlqKsRw"
+        dataElementName: "Major Surgeries Done in Inpatient"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "major_surgeries_done_in_inpatient_m"  # ← SQL column for: Male
+        dataElement: "npj4tlqKsRw"
+        dataElementName: "Major Surgeries Done in Inpatient"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatients Outcome-Stable-29 days to 1 Year
+      - key: "v_29_days_to_1_year_f"  # ← SQL column for: Female
+        dataElement: "FBGTznlhG52"
+        dataElementName: "Inpatients Outcome-Stable-29 days to 1 Year"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_29_days_to_1_year_m"  # ← SQL column for: Male
+        dataElement: "FBGTznlhG52"
+        dataElementName: "Inpatients Outcome-Stable-29 days to 1 Year"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Cases of Post Operative Infection Reported in Inpatient Minor Surgeries 
+      - key: "cases_of_post_operative_infection_report"
+        dataElement: "yNvksqFvO65"
+        dataElementName: "Cases of Post Operative Infection Reported in Inpatient Minor Surgeries "
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Inpatients Absconded- Age Group 20 - 29 Years
+      - key: "v_29_years_f_3"  # ← SQL column for: Female
+        dataElement: "OC96VpJIdoE"
+        dataElementName: "Inpatients Absconded- Age Group 20 - 29 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_29_years_m_3"  # ← SQL column for: Male
+        dataElement: "OC96VpJIdoE"
+        dataElementName: "Inpatients Absconded- Age Group 20 - 29 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatient Deaths in ≥ 48 Hours of Admission- Age Group 40 - 49 Years
+      - key: "v_49_years_f_3"  # ← SQL column for: Female
+        dataElement: "EDHAawGus2l"
+        dataElementName: "Inpatient Deaths in ≥ 48 Hours of Admission- Age Group 40 - 49 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_49_years_m_3"  # ← SQL column for: Male
+        dataElement: "EDHAawGus2l"
+        dataElementName: "Inpatient Deaths in ≥ 48 Hours of Admission- Age Group 40 - 49 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatient Deaths in ≥ 48 Hours of Admission-8 to 28 days
+      - key: "v_8_to_28_days_f_2"  # ← SQL column for: Female
+        dataElement: "aebRNbazF1u"
+        dataElementName: "Inpatient Deaths in ≥ 48 Hours of Admission-8 to 28 days"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_8_to_28_days_m_2"  # ← SQL column for: Male
+        dataElement: "aebRNbazF1u"
+        dataElementName: "Inpatient Deaths in ≥ 48 Hours of Admission-8 to 28 days"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatients Referred Out- Age Group 30 - 39 Years
+      - key: "v_39_years_f_4"  # ← SQL column for: Female
+        dataElement: "xRGqy7Adibr"
+        dataElementName: "Inpatients Referred Out- Age Group 30 - 39 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_39_years_m_4"  # ← SQL column for: Male
+        dataElement: "xRGqy7Adibr"
+        dataElementName: "Inpatients Referred Out- Age Group 30 - 39 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatients Outcome-Referred Out-8 to 28 days
+      - key: "v_8_to_28_days_f_3"  # ← SQL column for: Female
+        dataElement: "FSJ68ws5R8q"
+        dataElementName: "Inpatients Outcome-Referred Out-8 to 28 days"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_8_to_28_days_m_3"  # ← SQL column for: Male
+        dataElement: "FSJ68ws5R8q"
+        dataElementName: "Inpatients Outcome-Referred Out-8 to 28 days"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatients Outcome-Stable-01 to 04 Year
+      - key: "v_01_to_04_year_f"  # ← SQL column for: Female
+        dataElement: "SY9yhXNOxKV"
+        dataElementName: "Inpatients Outcome-Stable-01 to 04 Year"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_01_to_04_year_m"  # ← SQL column for: Male
+        dataElement: "SY9yhXNOxKV"
+        dataElementName: "Inpatients Outcome-Stable-01 to 04 Year"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatients Recovered/Cured- Age Group 30 - 39 Years
+      - key: "v_39_years_f_5"  # ← SQL column for: Female
+        dataElement: "byiU4Z8VZxP"
+        dataElementName: "Inpatients Recovered/Cured- Age Group 30 - 39 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_39_years_m_5"  # ← SQL column for: Male
+        dataElement: "byiU4Z8VZxP"
+        dataElementName: "Inpatients Recovered/Cured- Age Group 30 - 39 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatient Deaths in ≥ 48 Hours of Admission-0 to 7 days
+      - key: "v_0_to_7_days_f"  # ← SQL column for: Female
+        dataElement: "WQRxFdjHUwu"
+        dataElementName: "Inpatient Deaths in ≥ 48 Hours of Admission-0 to 7 days"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_0_to_7_days_m"  # ← SQL column for: Male
+        dataElement: "WQRxFdjHUwu"
+        dataElementName: "Inpatient Deaths in ≥ 48 Hours of Admission-0 to 7 days"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatient Reported DOR/LAMA/DAMA- Age Group 29 Days - 1 Year
+      - key: "v_1_year_f_2"  # ← SQL column for: Female
+        dataElement: "nAwr1SuDL5X"
+        dataElementName: "Inpatient Reported DOR/LAMA/DAMA- Age Group 29 Days - 1 Year"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_1_year_m_2"  # ← SQL column for: Male
+        dataElement: "nAwr1SuDL5X"
+        dataElementName: "Inpatient Reported DOR/LAMA/DAMA- Age Group 29 Days - 1 Year"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatients Recovered/Cured- Age Group 40 - 49 Years
+      - key: "v_49_years_f_4"  # ← SQL column for: Female
+        dataElement: "qFKmdcMXi8R"
+        dataElementName: "Inpatients Recovered/Cured- Age Group 40 - 49 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_49_years_m_4"  # ← SQL column for: Male
+        dataElement: "qFKmdcMXi8R"
+        dataElementName: "Inpatients Recovered/Cured- Age Group 40 - 49 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Total Inpatients Undergone Minor Surgeries
+      - key: "total_inpatients_undergone_minor_surge_f"  # ← SQL column for: Female
+        dataElement: "ds89kwFirfa"
+        dataElementName: "Total Inpatients Undergone Minor Surgeries"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "total_inpatients_undergone_minor_surge_m"  # ← SQL column for: Male
+        dataElement: "ds89kwFirfa"
+        dataElementName: "Total Inpatients Undergone Minor Surgeries"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatients Absconded- Age Group 01 - 04 Years
+      - key: "v_04_years_f_3"  # ← SQL column for: Female
+        dataElement: "R9VsHuLaaOV"
+        dataElementName: "Inpatients Absconded- Age Group 01 - 04 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_04_years_m_3"  # ← SQL column for: Male
+        dataElement: "R9VsHuLaaOV"
+        dataElementName: "Inpatients Absconded- Age Group 01 - 04 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatient Reported DOR/LAMA/DAMA- Age Group 50 - 59 Years
+      - key: "v_59_years_f_4"  # ← SQL column for: Female
+        dataElement: "IgUWH05VOXS"
+        dataElementName: "Inpatient Reported DOR/LAMA/DAMA- Age Group 50 - 59 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_59_years_m_4"  # ← SQL column for: Male
+        dataElement: "IgUWH05VOXS"
+        dataElementName: "Inpatient Reported DOR/LAMA/DAMA- Age Group 50 - 59 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatients Recovered/Cured- Age Group 8-28 days
+      - key: "v_28_days_f"  # ← SQL column for: Female
+        dataElement: "aw0UrONFp8G"
+        dataElementName: "Inpatients Recovered/Cured- Age Group 8-28 days"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_28_days_m"  # ← SQL column for: Male
+        dataElement: "aw0UrONFp8G"
+        dataElementName: "Inpatients Recovered/Cured- Age Group 8-28 days"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatients Outcome-Absconded-60 to 69 Years
+      - key: "v_60_to_69_years_f"  # ← SQL column for: Female
+        dataElement: "cWW5H0a30nH"
+        dataElementName: "Inpatients Outcome-Absconded-60 to 69 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_60_to_69_years_m"  # ← SQL column for: Male
+        dataElement: "cWW5H0a30nH"
+        dataElementName: "Inpatients Outcome-Absconded-60 to 69 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatient-Intermediate surgeries-Inpatient-Post operative infection
+      - key: "post_operative_infection"
+        dataElement: "OCHPfRV20lM"
+        dataElementName: "Inpatient-Intermediate surgeries-Inpatient-Post operative infection"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Inpatients Absconded- Age Group 40 - 49 Years
+      - key: "v_49_years_f_5"  # ← SQL column for: Female
+        dataElement: "GwmblUqSoMS"
+        dataElementName: "Inpatients Absconded- Age Group 40 - 49 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_49_years_m_5"  # ← SQL column for: Male
+        dataElement: "GwmblUqSoMS"
+        dataElementName: "Inpatients Absconded- Age Group 40 - 49 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatients Recovered/Cured- Age Group 01 - 04 Years
+      - key: "v_04_years_f_4"  # ← SQL column for: Female
+        dataElement: "hfKKGFpcahT"
+        dataElementName: "Inpatients Recovered/Cured- Age Group 01 - 04 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_04_years_m_4"  # ← SQL column for: Male
+        dataElement: "hfKKGFpcahT"
+        dataElementName: "Inpatients Recovered/Cured- Age Group 01 - 04 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatients Outcome-Stable-05 to 14 Year
+      - key: "v_05_to_14_year_f"  # ← SQL column for: Female
+        dataElement: "SrXLG8LgypM"
+        dataElementName: "Inpatients Outcome-Stable-05 to 14 Year"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_05_to_14_year_m"  # ← SQL column for: Male
+        dataElement: "SrXLG8LgypM"
+        dataElementName: "Inpatients Outcome-Stable-05 to 14 Year"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatients Outcome-Referred Out- ≥ 70 Years
+      - key: "v_70_years_f_2"  # ← SQL column for: Female
+        dataElement: "mJtKzHyyCAW"
+        dataElementName: "Inpatients Outcome-Referred Out- ≥ 70 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_70_years_m_2"  # ← SQL column for: Male
+        dataElement: "mJtKzHyyCAW"
+        dataElementName: "Inpatients Outcome-Referred Out- ≥ 70 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatients Outcome-Stable-40 to 49 Year
+      - key: "v_40_to_49_year_f"  # ← SQL column for: Female
+        dataElement: "SYsn3Q7bpEM"
+        dataElementName: "Inpatients Outcome-Stable-40 to 49 Year"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_40_to_49_year_m"  # ← SQL column for: Male
+        dataElement: "SYsn3Q7bpEM"
+        dataElementName: "Inpatients Outcome-Stable-40 to 49 Year"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatient Deaths in ≥ 48 Hours of Admission- Age Group 05 - 14 Years
+      - key: "v_14_years_f_3"  # ← SQL column for: Female
+        dataElement: "YTzkpp1RDGx"
+        dataElementName: "Inpatient Deaths in ≥ 48 Hours of Admission- Age Group 05 - 14 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_14_years_m_3"  # ← SQL column for: Male
+        dataElement: "YTzkpp1RDGx"
+        dataElementName: "Inpatient Deaths in ≥ 48 Hours of Admission- Age Group 05 - 14 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatient Reported DOR/LAMA/DAMA- Age Group 20 - 29 Years
+      - key: "v_29_years_f_4"  # ← SQL column for: Female
+        dataElement: "oQDF5rAiZ9s"
+        dataElementName: "Inpatient Reported DOR/LAMA/DAMA- Age Group 20 - 29 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_29_years_m_4"  # ← SQL column for: Male
+        dataElement: "oQDF5rAiZ9s"
+        dataElementName: "Inpatient Reported DOR/LAMA/DAMA- Age Group 20 - 29 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatients Outcome-Referred Out-60 -69 Years
+      - key: "v_69_years_f"  # ← SQL column for: Female
+        dataElement: "X8zqZMPNOgz"
+        dataElementName: "Inpatients Outcome-Referred Out-60 -69 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_69_years_m"  # ← SQL column for: Male
+        dataElement: "X8zqZMPNOgz"
+        dataElementName: "Inpatients Outcome-Referred Out-60 -69 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatients Absconded- Age Group 15 - 19 Years
+      - key: "v_19_years_f_2"  # ← SQL column for: Female
+        dataElement: "PZP5PrfHPeK"
+        dataElementName: "Inpatients Absconded- Age Group 15 - 19 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_19_years_m_2"  # ← SQL column for: Male
+        dataElement: "PZP5PrfHPeK"
+        dataElementName: "Inpatients Absconded- Age Group 15 - 19 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatient Deaths in ≥ 48 Hours of Admission-60 to 69 Years
+      - key: "v_60_to_69_years_f_2"  # ← SQL column for: Female
+        dataElement: "ADTvSS6ZkWi"
+        dataElementName: "Inpatient Deaths in ≥ 48 Hours of Admission-60 to 69 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_60_to_69_years_m_2"  # ← SQL column for: Male
+        dataElement: "ADTvSS6ZkWi"
+        dataElementName: "Inpatient Deaths in ≥ 48 Hours of Admission-60 to 69 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatients Outcome-Stable-0-7 days
+      - key: "v_7_days_f"  # ← SQL column for: Female
+        dataElement: "ZchNDuXAuns"
+        dataElementName: "Inpatients Outcome-Stable-0-7 days"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_7_days_m"  # ← SQL column for: Male
+        dataElement: "ZchNDuXAuns"
+        dataElementName: "Inpatients Outcome-Stable-0-7 days"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatients Referred Out- Age Group 29 Days - 1 Year
+      - key: "v_1_year_f_3"  # ← SQL column for: Female
+        dataElement: "MG81K0P93cC"
+        dataElementName: "Inpatients Referred Out- Age Group 29 Days - 1 Year"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_1_year_m_3"  # ← SQL column for: Male
+        dataElement: "MG81K0P93cC"
+        dataElementName: "Inpatients Referred Out- Age Group 29 Days - 1 Year"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatients Referred Out- Age Group 05 - 14 Years
+      - key: "v_14_years_f_4"  # ← SQL column for: Female
+        dataElement: "q1rh08vhNLa"
+        dataElementName: "Inpatients Referred Out- Age Group 05 - 14 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_14_years_m_4"  # ← SQL column for: Male
+        dataElement: "q1rh08vhNLa"
+        dataElementName: "Inpatients Referred Out- Age Group 05 - 14 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatient Deaths in < 48 Hours of Admission- Age Group 20 - 29 Years
+      - key: "v_29_years_f_5"  # ← SQL column for: Female
+        dataElement: "EHz6GfxpuXw"
+        dataElementName: "Inpatient Deaths in < 48 Hours of Admission- Age Group 20 - 29 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_29_years_m_5"  # ← SQL column for: Male
+        dataElement: "EHz6GfxpuXw"
+        dataElementName: "Inpatient Deaths in < 48 Hours of Admission- Age Group 20 - 29 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatient Deaths in < 48 Hours of Admission- Age Group 40 - 49 Years
+      - key: "v_49_years_f_6"  # ← SQL column for: Female
+        dataElement: "VDDHvT1MISE"
+        dataElementName: "Inpatient Deaths in < 48 Hours of Admission- Age Group 40 - 49 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_49_years_m_6"  # ← SQL column for: Male
+        dataElement: "VDDHvT1MISE"
+        dataElementName: "Inpatient Deaths in < 48 Hours of Admission- Age Group 40 - 49 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatient Deaths in < 48 Hours of Admission- ≥ 70 Years
+      - key: "v_70_years_f_3"  # ← SQL column for: Female
+        dataElement: "K7ysJSxXsmE"
+        dataElementName: "Inpatient Deaths in < 48 Hours of Admission- ≥ 70 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_70_years_m_3"  # ← SQL column for: Male
+        dataElement: "K7ysJSxXsmE"
+        dataElementName: "Inpatient Deaths in < 48 Hours of Admission- ≥ 70 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatient Deaths in ≥ 48 Hours of Admission- Age Group 29 Days - 1 Year
+      - key: "v_1_year_f_4"  # ← SQL column for: Female
+        dataElement: "u5Ju7K3EFZ3"
+        dataElementName: "Inpatient Deaths in ≥ 48 Hours of Admission- Age Group 29 Days - 1 Year"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_1_year_m_4"  # ← SQL column for: Male
+        dataElement: "u5Ju7K3EFZ3"
+        dataElementName: "Inpatient Deaths in ≥ 48 Hours of Admission- Age Group 29 Days - 1 Year"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatient-Intermediate surgeries-Emergency-Post operative infection
+      - key: "post_operative_infection_2"
+        dataElement: "myd5N04yqWS"
+        dataElementName: "Inpatient-Intermediate surgeries-Emergency-Post operative infection"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Inpatient Deaths-in < 48 Hours of Admission-8 to 28 days
+      - key: "v_8_to_28_days_f_4"  # ← SQL column for: Female
+        dataElement: "TY2g2JJ60se"
+        dataElementName: "Inpatient Deaths-in < 48 Hours of Admission-8 to 28 days"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_8_to_28_days_m_4"  # ← SQL column for: Male
+        dataElement: "TY2g2JJ60se"
+        dataElementName: "Inpatient Deaths-in < 48 Hours of Admission-8 to 28 days"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatients Referred Out- Age Group 50 - 59 Years
+      - key: "v_59_years_f_5"  # ← SQL column for: Female
+        dataElement: "O3Z3alM218T"
+        dataElementName: "Inpatients Referred Out- Age Group 50 - 59 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_59_years_m_5"  # ← SQL column for: Male
+        dataElement: "O3Z3alM218T"
+        dataElementName: "Inpatients Referred Out- Age Group 50 - 59 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatients Outcome-Stable-20 to 29 Year
+      - key: "v_20_to_29_year_f"  # ← SQL column for: Female
+        dataElement: "fGGxZFck8rJ"
+        dataElementName: "Inpatients Outcome-Stable-20 to 29 Year"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_20_to_29_year_m"  # ← SQL column for: Male
+        dataElement: "fGGxZFck8rJ"
+        dataElementName: "Inpatients Outcome-Stable-20 to 29 Year"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatients Absconded- Age Group 05 - 14 Years
+      - key: "v_14_years_f_5"  # ← SQL column for: Female
+        dataElement: "i80uwDMocMV"
+        dataElementName: "Inpatients Absconded- Age Group 05 - 14 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_14_years_m_5"  # ← SQL column for: Male
+        dataElement: "i80uwDMocMV"
+        dataElementName: "Inpatients Absconded- Age Group 05 - 14 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatient Deaths in < 48 Hours of Admission- Age Group 15 - 19 Years
+      - key: "v_19_years_f_3"  # ← SQL column for: Female
+        dataElement: "J3B6Aqs64TL"
+        dataElementName: "Inpatient Deaths in < 48 Hours of Admission- Age Group 15 - 19 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_19_years_m_3"  # ← SQL column for: Male
+        dataElement: "J3B6Aqs64TL"
+        dataElementName: "Inpatient Deaths in < 48 Hours of Admission- Age Group 15 - 19 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatient Outcome-DOPR/LAMA- 60 to 69 Years
+      - key: "v_60_to_69_years_f_3"  # ← SQL column for: Female
+        dataElement: "O55ilAmKVCL"
+        dataElementName: "Inpatient Outcome-DOPR/LAMA- 60 to 69 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_60_to_69_years_m_3"  # ← SQL column for: Male
+        dataElement: "O55ilAmKVCL"
+        dataElementName: "Inpatient Outcome-DOPR/LAMA- 60 to 69 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatient Deaths in ≥ 48 Hours of Admission- Age Group 01 - 04 Years
+      - key: "v_04_years_f_5"  # ← SQL column for: Female
+        dataElement: "W1Tfa8N3tEq"
+        dataElementName: "Inpatient Deaths in ≥ 48 Hours of Admission- Age Group 01 - 04 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_04_years_m_5"  # ← SQL column for: Male
+        dataElement: "W1Tfa8N3tEq"
+        dataElementName: "Inpatient Deaths in ≥ 48 Hours of Admission- Age Group 01 - 04 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatient Deaths- in < 48 Hours of Admission-0 to 7 days
+      - key: "v_0_to_7_days_f_2"  # ← SQL column for: Female
+        dataElement: "uOpuphGuSnO"
+        dataElementName: "Inpatient Deaths- in < 48 Hours of Admission-0 to 7 days"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_0_to_7_days_m_2"  # ← SQL column for: Male
+        dataElement: "uOpuphGuSnO"
+        dataElementName: "Inpatient Deaths- in < 48 Hours of Admission-0 to 7 days"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatients Outcome-DOPR/LAMA-0 to 7 days
+      - key: "v_0_to_7_days_f_3"  # ← SQL column for: Female
+        dataElement: "PjX59M4FWsV"
+        dataElementName: "Inpatients Outcome-DOPR/LAMA-0 to 7 days"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_0_to_7_days_m_3"  # ← SQL column for: Male
+        dataElement: "PjX59M4FWsV"
+        dataElementName: "Inpatients Outcome-DOPR/LAMA-0 to 7 days"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatients Outcome-Stable-8 to28 days
+      - key: "v_8_to28_days_f"  # ← SQL column for: Female
+        dataElement: "JZxN7maZNTP"
+        dataElementName: "Inpatients Outcome-Stable-8 to28 days"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_8_to28_days_m"  # ← SQL column for: Male
+        dataElement: "JZxN7maZNTP"
+        dataElementName: "Inpatients Outcome-Stable-8 to28 days"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatients Outcome-Stable-60 to 69 Year
+      - key: "v_60_to_69_year_f"  # ← SQL column for: Female
+        dataElement: "kfKZhz8cxld"
+        dataElementName: "Inpatients Outcome-Stable-60 to 69 Year"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_60_to_69_year_m"  # ← SQL column for: Male
+        dataElement: "kfKZhz8cxld"
+        dataElementName: "Inpatients Outcome-Stable-60 to 69 Year"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatients Outcome-Absconded-0 to 7 days
+      - key: "v_0_to_7_days_f_4"  # ← SQL column for: Female
+        dataElement: "Fqk8Q7IyFGm"
+        dataElementName: "Inpatients Outcome-Absconded-0 to 7 days"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_0_to_7_days_m_4"  # ← SQL column for: Male
+        dataElement: "Fqk8Q7IyFGm"
+        dataElementName: "Inpatients Outcome-Absconded-0 to 7 days"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatients Outcome-Referred Out-0 to 7 days
+      - key: "v_0_to_7_days_f_5"  # ← SQL column for: Female
+        dataElement: "mNpQUrhMY2M"
+        dataElementName: "Inpatients Outcome-Referred Out-0 to 7 days"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_0_to_7_days_m_5"  # ← SQL column for: Male
+        dataElement: "mNpQUrhMY2M"
+        dataElementName: "Inpatients Outcome-Referred Out-0 to 7 days"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatients Outcome-Stable-30 to 39 Year
+      - key: "v_30_to_39_year_f"  # ← SQL column for: Female
+        dataElement: "BCTQqvSi9Fp"
+        dataElementName: "Inpatients Outcome-Stable-30 to 39 Year"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_30_to_39_year_m"  # ← SQL column for: Male
+        dataElement: "BCTQqvSi9Fp"
+        dataElementName: "Inpatients Outcome-Stable-30 to 39 Year"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatients Outcome-Absconded-8 to 28 days
+      - key: "v_8_to_28_days_f_5"  # ← SQL column for: Female
+        dataElement: "lTMICysCO1L"
+        dataElementName: "Inpatients Outcome-Absconded-8 to 28 days"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_8_to_28_days_m_5"  # ← SQL column for: Male
+        dataElement: "lTMICysCO1L"
+        dataElementName: "Inpatients Outcome-Absconded-8 to 28 days"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatient Deaths in < 48 Hours of Admission- Age Group 29 Days - 1 Year
+      - key: "v_1_year_f_5"  # ← SQL column for: Female
+        dataElement: "I9luOd2a7XZ"
+        dataElementName: "Inpatient Deaths in < 48 Hours of Admission- Age Group 29 Days - 1 Year"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_1_year_m_5"  # ← SQL column for: Male
+        dataElement: "I9luOd2a7XZ"
+        dataElementName: "Inpatient Deaths in < 48 Hours of Admission- Age Group 29 Days - 1 Year"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatients Referred Out- Age Group 15 - 19 Years
+      - key: "v_19_years_f_4"  # ← SQL column for: Female
+        dataElement: "FVUaOSyrp8X"
+        dataElementName: "Inpatients Referred Out- Age Group 15 - 19 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_19_years_m_4"  # ← SQL column for: Male
+        dataElement: "FVUaOSyrp8X"
+        dataElementName: "Inpatients Referred Out- Age Group 15 - 19 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatients Outcome-Stable-50 to 59 Year
+      - key: "v_50_to_59_year_f"  # ← SQL column for: Female
+        dataElement: "QZzqdCD5pWM"
+        dataElementName: "Inpatients Outcome-Stable-50 to 59 Year"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_50_to_59_year_m"  # ← SQL column for: Male
+        dataElement: "QZzqdCD5pWM"
+        dataElementName: "Inpatients Outcome-Stable-50 to 59 Year"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatients Outcome-Absconded- ≥ 70 Years
+      - key: "v_70_years_f_4"  # ← SQL column for: Female
+        dataElement: "QMtXxyDBkoy"
+        dataElementName: "Inpatients Outcome-Absconded- ≥ 70 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_70_years_m_4"  # ← SQL column for: Male
+        dataElement: "QMtXxyDBkoy"
+        dataElementName: "Inpatients Outcome-Absconded- ≥ 70 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatient Reported DOR/LAMA/DAMA- Age Group 05 - 14 Years
+      - key: "v_14_years_f_6"  # ← SQL column for: Female
+        dataElement: "aFDqE1qyJwH"
+        dataElementName: "Inpatient Reported DOR/LAMA/DAMA- Age Group 05 - 14 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_14_years_m_6"  # ← SQL column for: Male
+        dataElement: "aFDqE1qyJwH"
+        dataElementName: "Inpatient Reported DOR/LAMA/DAMA- Age Group 05 - 14 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatient-Intermediate surgeries in Emergency
+      - key: "intermediate_surgeries_in_emergency_f"  # ← SQL column for: Female
+        dataElement: "cYSIelGCG3M"
+        dataElementName: "Inpatient-Intermediate surgeries in Emergency"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "intermediate_surgeries_in_emergency_m"  # ← SQL column for: Male
+        dataElement: "cYSIelGCG3M"
+        dataElementName: "Inpatient-Intermediate surgeries in Emergency"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatient Deaths in ≥ 48 Hours of Admission- Age Group 15 - 19 Years
+      - key: "v_19_years_f_5"  # ← SQL column for: Female
+        dataElement: "NuvEJyyrRyn"
+        dataElementName: "Inpatient Deaths in ≥ 48 Hours of Admission- Age Group 15 - 19 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_19_years_m_5"  # ← SQL column for: Male
+        dataElement: "NuvEJyyrRyn"
+        dataElementName: "Inpatient Deaths in ≥ 48 Hours of Admission- Age Group 15 - 19 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatients Absconded- Age Group 29 Days - 1 Year
+      - key: "v_1_year_f_6"  # ← SQL column for: Female
+        dataElement: "q1hEowbwEte"
+        dataElementName: "Inpatients Absconded- Age Group 29 Days - 1 Year"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_1_year_m_6"  # ← SQL column for: Male
+        dataElement: "q1hEowbwEte"
+        dataElementName: "Inpatients Absconded- Age Group 29 Days - 1 Year"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatient Outcome-DOPR/LAMA- ≥ 70 Years
+      - key: "v_70_years_f_5"  # ← SQL column for: Female
+        dataElement: "lGlrmWuQ6BN"
+        dataElementName: "Inpatient Outcome-DOPR/LAMA- ≥ 70 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_70_years_m_5"  # ← SQL column for: Male
+        dataElement: "lGlrmWuQ6BN"
+        dataElementName: "Inpatient Outcome-DOPR/LAMA- ≥ 70 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatient Deaths in < 48 Hours of Admission- Age Group 50 - 59 Years
+      - key: "v_59_years_f_6"  # ← SQL column for: Female
+        dataElement: "rjN2W3sO17N"
+        dataElementName: "Inpatient Deaths in < 48 Hours of Admission- Age Group 50 - 59 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_59_years_m_6"  # ← SQL column for: Male
+        dataElement: "rjN2W3sO17N"
+        dataElementName: "Inpatient Deaths in < 48 Hours of Admission- Age Group 50 - 59 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatients Recovered/Cured- Age Group >=70 Years
+      - key: "age_group_70_years_f"  # ← SQL column for: Female
+        dataElement: "ExK3mV0mW4C"
+        dataElementName: "Inpatients Recovered/Cured- Age Group >=70 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "age_group_70_years_m"  # ← SQL column for: Male
+        dataElement: "ExK3mV0mW4C"
+        dataElementName: "Inpatients Recovered/Cured- Age Group >=70 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatients Recovered/Cured- Age Group 60-69 Years
+      - key: "v_69_years_f_2"  # ← SQL column for: Female
+        dataElement: "x6AnbSOW91m"
+        dataElementName: "Inpatients Recovered/Cured- Age Group 60-69 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_69_years_m_2"  # ← SQL column for: Male
+        dataElement: "x6AnbSOW91m"
+        dataElementName: "Inpatients Recovered/Cured- Age Group 60-69 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatients Recovered/Cured- Age Group 0-7 days
+      - key: "v_7_days_f_2"  # ← SQL column for: Female
+        dataElement: "niC6UlH8lG8"
+        dataElementName: "Inpatients Recovered/Cured- Age Group 0-7 days"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_7_days_m_2"  # ← SQL column for: Male
+        dataElement: "niC6UlH8lG8"
+        dataElementName: "Inpatients Recovered/Cured- Age Group 0-7 days"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatient Deaths in < 48 Hours of Admission-60 to 69 Years
+      - key: "v_60_to_69_years_f_4"  # ← SQL column for: Female
+        dataElement: "rVq4pfFzR1Y"
+        dataElementName: "Inpatient Deaths in < 48 Hours of Admission-60 to 69 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_60_to_69_years_m_4"  # ← SQL column for: Male
+        dataElement: "rVq4pfFzR1Y"
+        dataElementName: "Inpatient Deaths in < 48 Hours of Admission-60 to 69 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatients Referred Out- Age Group 01 - 04 Years
+      - key: "v_04_years_f_6"  # ← SQL column for: Female
+        dataElement: "BHMcr2LttVZ"
+        dataElementName: "Inpatients Referred Out- Age Group 01 - 04 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_04_years_m_6"  # ← SQL column for: Male
+        dataElement: "BHMcr2LttVZ"
+        dataElementName: "Inpatients Referred Out- Age Group 01 - 04 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatients Referred Out- Age Group 20 - 29 Years
+      - key: "v_29_years_f_6"  # ← SQL column for: Female
+        dataElement: "qC0mnCelPuB"
+        dataElementName: "Inpatients Referred Out- Age Group 20 - 29 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_29_years_m_6"  # ← SQL column for: Male
+        dataElement: "qC0mnCelPuB"
+        dataElementName: "Inpatients Referred Out- Age Group 20 - 29 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatient Reported DOR/LAMA/DAMA- Age Group 30 - 39 Years
+      - key: "v_39_years_f_6"  # ← SQL column for: Female
+        dataElement: "Nifo5ju2pPP"
+        dataElementName: "Inpatient Reported DOR/LAMA/DAMA- Age Group 30 - 39 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_39_years_m_6"  # ← SQL column for: Male
+        dataElement: "Nifo5ju2pPP"
+        dataElementName: "Inpatient Reported DOR/LAMA/DAMA- Age Group 30 - 39 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Inpatient Reported DOR/LAMA/DAMA- Age Group 15 - 19 Years
+      - key: "v_19_years_f_6"  # ← SQL column for: Female
+        dataElement: "HnwIe5GtEQd"
+        dataElementName: "Inpatient Reported DOR/LAMA/DAMA- Age Group 15 - 19 Years"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "v_19_years_m_6"  # ← SQL column for: Male
+        dataElement: "HnwIe5GtEQd"
+        dataElementName: "Inpatient Reported DOR/LAMA/DAMA- Age Group 15 - 19 Years"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+  # ──────────────────────────────────────────────────────
+  - name:     "Referrals"
+    sql_file: "sql/01_3_hospital_indoor_service_new/referrals.sql"
+    optional: false
+    mappings:
+
+      # FCHVs Received Free Health Services at Referred Out
+      - key: "fchvs_received_free_health_services_at_r"
+        dataElement: "pF1Mv020yUl"
+        dataElementName: "FCHVs Received Free Health Services at Referred Out"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Disabled Patients Received Free Health Services at Referred Out
+      - key: "disabled_patients_received_free_health_s"
+        dataElement: "NoJQulKOcgB"
+        dataElementName: "Disabled Patients Received Free Health Services at Referred Out"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+  # ──────────────────────────────────────────────────────
+  - name:     "Diagnostic Services"
+    sql_file: "sql/01_3_hospital_indoor_service_new/diagnostic_services.sql"
+    optional: false
+    mappings:
+
+      # Post Operative Infection in Major Surgeries at Emergency
+      - key: "post_operative_infection_in_major_surger"
+        dataElement: "LkfqkCTEMqY"
+        dataElementName: "Post Operative Infection in Major Surgeries at Emergency"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Cases of Post Operative Infection Reported in Outpatient Minor Surgeries
+      - key: "cases_of_post_operative_infection_report"
+        dataElement: "f9CFvnVSAic"
+        dataElementName: "Cases of Post Operative Infection Reported in Outpatient Minor Surgeries"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Cases of Post Operative Infection Reported in Emergency Minor Surgeries
+      - key: "cases_of_post_operative_infection_report_2"
+        dataElement: "gGNm8ee9hl8"
+        dataElementName: "Cases of Post Operative Infection Reported in Emergency Minor Surgeries"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Post Operative Infection in Major Surgeries at IPD
+      - key: "post_operative_infection_in_major_surger_2"
+        dataElement: "DD8l8cg0zzD"
+        dataElementName: "Post Operative Infection in Major Surgeries at IPD"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+  # ──────────────────────────────────────────────────────
+  - name:     "Free Services (Ultra Poor)"
+    sql_file: "sql/01_3_hospital_indoor_service_new/free_services.sql"
+    optional: false
+    mappings:
+    # key prefix "upppprfhs" = "Ultra Poor Patients Poor Patients Received Free Health Services"
+
+      # Ultra Poor Patients/ Poor Patients Received Free Health Services in IPD
+      - key: "upppprfhs_ipd"
+        dataElement: "blQafu930Fk"
+        dataElementName: "Ultra Poor Patients/ Poor Patients Received Free Health Services in IPD"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Ultra Poor Patients/ Poor Patients Received Free Health Services in OPD
+      - key: "upppprfhs_opd"
+        dataElement: "fMgY7buyPgJ"
+        dataElementName: "Ultra Poor Patients/ Poor Patients Received Free Health Services in OPD"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Ultra Poor Patients/ Poor Patients Received Free Health Services in Emergency
+      - key: "upppprfhs_emergency"
+        dataElement: "sboNx8FiP4d"
+        dataElementName: "Ultra Poor Patients/ Poor Patients Received Free Health Services in Emergency"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Ultra Poor Patients/ Poor Patients Received Free Health Services at Referral Out
+      - key: "upppprfhs_referral_out"
+        dataElement: "yeGkme7Wda5"
+        dataElementName: "Ultra Poor Patients/ Poor Patients Received Free Health Services at Referral Out"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+  # ──────────────────────────────────────────────────────
+  - name:     "ORC Clinics / Immunization / FCHV"
+    sql_file: "sql/01_3_hospital_indoor_service_new/orc_fchv.sql"
+    optional: true
+    mappings:
+    # key prefix "frfhs" = "Fchvs Received Free Health Services"
+
+      # FCHVs Received Free Health Services in Emergency
+      - key: "frfhs_emergency"
+        dataElement: "YLBxlWQ2Ji5"
+        dataElementName: "FCHVs Received Free Health Services in Emergency"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # FCHVs Received Free Health Services in OPD
+      - key: "frfhs_opd"
+        dataElement: "SIODC3GmBPx"
+        dataElementName: "FCHVs Received Free Health Services in OPD"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # FCHVs Received Free Health Services in IPD
+      - key: "frfhs_ipd"
+        dataElement: "brA0o59G66l"
+        dataElementName: "FCHVs Received Free Health Services in IPD"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+  # ──────────────────────────────────────────────────────
+  - name:     "Other"
+    sql_file: "sql/01_3_hospital_indoor_service_new/other.sql"
+    optional: true
+    mappings:
+
+      # Pregnant Women with Gestational Weeks (≥ 42) having Grand Multigravida
+      - key: "pregnant_women_with_gestational_weeks_ha"
+        dataElement: "fgGIHbLGHr3"
+        dataElementName: "Pregnant Women with Gestational Weeks (≥ 42) having Grand Multigravida"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Gender Based Violence Cases Received Free Health Services in Emergency
+      - key: "gender_based_violence_cases_received_fre"
+        dataElement: "qLLnISVBthc"
+        dataElementName: "Gender Based Violence Cases Received Free Health Services in Emergency"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Senior Citizens of Age > 60 Years Received Free Health Services in IPD
+      - key: "senior_citizens_of_age_60_years_received"
+        dataElement: "FpFz27OnLjo"
+        dataElementName: "Senior Citizens of Age > 60 Years Received Free Health Services in IPD"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Total Early Neonatal Deaths in the Hospital
+      - key: "total_early_neonatal_deaths_in_the_hos_f"  # ← SQL column for: Female
+        dataElement: "wE8Ua9fF57W"
+        dataElementName: "Total Early Neonatal Deaths in the Hospital"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "total_early_neonatal_deaths_in_the_hos_m"  # ← SQL column for: Male
+        dataElement: "wE8Ua9fF57W"
+        dataElementName: "Total Early Neonatal Deaths in the Hospital"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Other Patients Received Free Health Services at Referral Out
+      - key: "other_patients_received_free_health_serv"
+        dataElement: "r46z953ZAdI"
+        dataElementName: "Other Patients Received Free Health Services at Referral Out"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Helpless/ Destitute Patients Received Free Health Services in Emergency
+      - key: "helpless_destitute_patients_received_fre"
+        dataElement: "B9svAWSTFQt"
+        dataElementName: "Helpless/ Destitute Patients Received Free Health Services in Emergency"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Pregnant Women with Gestational Weeks (28 - 36) having Primigravida
+      - key: "pregnant_women_with_gestational_weeks_ha_2"
+        dataElement: "XfaiH4LO4HU"
+        dataElementName: "Pregnant Women with Gestational Weeks (28 - 36) having Primigravida"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Total Emergency Patients Undergone Minor Surgeries
+      - key: "total_emergency_patients_undergone_min_f"  # ← SQL column for: Female
+        dataElement: "PPLkh56gSDt"
+        dataElementName: "Total Emergency Patients Undergone Minor Surgeries"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "total_emergency_patients_undergone_min_m"  # ← SQL column for: Male
+        dataElement: "PPLkh56gSDt"
+        dataElementName: "Total Emergency Patients Undergone Minor Surgeries"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Pregnant Women with Gestational Weeks (22 - 27) having Multigravida
+      - key: "pregnant_women_with_gestational_weeks_ha_3"
+        dataElement: "OQ4CxYP11zR"
+        dataElementName: "Pregnant Women with Gestational Weeks (22 - 27) having Multigravida"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Gender Based Violence Cases Received Free Health Services at Referral Out
+      - key: "gender_based_violence_cases_received_fre_2"
+        dataElement: "GnYEgVNXJ0K"
+        dataElementName: "Gender Based Violence Cases Received Free Health Services at Referral Out"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Pregnant Women of Age <20 with Gestational Weeks (28 - 36)
+      - key: "pregnant_women_of_age_20_with_gestationa"
+        dataElement: "a7MLCIvl3N0"
+        dataElementName: "Pregnant Women of Age <20 with Gestational Weeks (28 - 36)"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Pregnant Women of Age <20 with Gestational Weeks (≥ 42)
+      - key: "pregnant_women_of_age_20_with_gestationa_2"
+        dataElement: "NmLTLB5IM4x"
+        dataElementName: "Pregnant Women of Age <20 with Gestational Weeks (≥ 42)"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Pregnant Women of Age ≥ 35 with Gestational Weeks (37 - 41)
+      - key: "pregnant_women_of_age_35_with_gestationa"
+        dataElement: "bbMBbR3oQa5"
+        dataElementName: "Pregnant Women of Age ≥ 35 with Gestational Weeks (37 - 41)"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Total Outpatients Undergone Minor Surgeries
+      - key: "total_outpatients_undergone_minor_surg_f"  # ← SQL column for: Female
+        dataElement: "XOIIA9PktoG"
+        dataElementName: "Total Outpatients Undergone Minor Surgeries"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "total_outpatients_undergone_minor_surg_m"  # ← SQL column for: Male
+        dataElement: "XOIIA9PktoG"
+        dataElementName: "Total Outpatients Undergone Minor Surgeries"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Pregnant Women with Gestational Weeks (28 - 36) having Grand Multigravida
+      - key: "pregnant_women_with_gestational_weeks_ha_4"
+        dataElement: "GU5n3qxVV1G"
+        dataElementName: "Pregnant Women with Gestational Weeks (28 - 36) having Grand Multigravida"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Pregnant Women with Gestational Weeks (22 - 27) having Grand Multigravida
+      - key: "pregnant_women_with_gestational_weeks_ha_5"
+        dataElement: "ErsRqXBszJe"
+        dataElementName: "Pregnant Women with Gestational Weeks (22 - 27) having Grand Multigravida"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Total Late Neonatal Deaths in the Hospital
+      - key: "total_late_neonatal_deaths_in_the_hosp_f"  # ← SQL column for: Female
+        dataElement: "i9Fd6Sg4Xvz"
+        dataElementName: "Total Late Neonatal Deaths in the Hospital"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "total_late_neonatal_deaths_in_the_hosp_m"  # ← SQL column for: Male
+        dataElement: "i9Fd6Sg4Xvz"
+        dataElementName: "Total Late Neonatal Deaths in the Hospital"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Other Patients Received Free Health Services in Emergency
+      - key: "other_patients_received_free_health_serv_2"
+        dataElement: "sSIsC8lbPDs"
+        dataElementName: "Other Patients Received Free Health Services in Emergency"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Pregnant Women with Gestational Weeks (≥ 42) having Primigravida
+      - key: "pregnant_women_with_gestational_weeks_ha_6"
+        dataElement: "Wz9lyL4EFgc"
+        dataElementName: "Pregnant Women with Gestational Weeks (≥ 42) having Primigravida"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Pregnant Women of Age 20 - 34 with Gestational Weeks (37 - 41)
+      - key: "v_34_with_gestational_weeks"
+        dataElement: "T2RIoCzbcrE"
+        dataElementName: "Pregnant Women of Age 20 - 34 with Gestational Weeks (37 - 41)"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Pregnant Women with Gestational Weeks (37 - 41) having Multigravida
+      - key: "pregnant_women_with_gestational_weeks_ha_7"
+        dataElement: "Wz6fi5h43ln"
+        dataElementName: "Pregnant Women with Gestational Weeks (37 - 41) having Multigravida"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Pregnant Women with Gestational Weeks (≥ 42) having Multigravida
+      - key: "pregnant_women_with_gestational_weeks_ha_8"
+        dataElement: "f95dTxsNaOr"
+        dataElementName: "Pregnant Women with Gestational Weeks (≥ 42) having Multigravida"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Senior Citizens of Age > 60 Years Received Free Health Services in Emergency
+      - key: "senior_citizens_of_age_60_years_received_2"
+        dataElement: "wYwdmBDhBNu"
+        dataElementName: "Senior Citizens of Age > 60 Years Received Free Health Services in Emergency"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Pregnant Women of Age ≥ 35 with Gestational Weeks (≥ 42)
+      - key: "pregnant_women_of_age_35_with_gestationa_2"
+        dataElement: "KWtpxg9gMS0"
+        dataElementName: "Pregnant Women of Age ≥ 35 with Gestational Weeks (≥ 42)"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Pregnant Women of Age 20 - 34 with Gestational Weeks (28 - 36)
+      - key: "v_34_with_gestational_weeks_2"
+        dataElement: "jW4Nxz5ZtTc"
+        dataElementName: "Pregnant Women of Age 20 - 34 with Gestational Weeks (28 - 36)"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Amount of Exempted Cost for Completely Received Free Health Services 
+      - key: "amount_of_exempted_cost_for_completely_r"
+        dataElement: "sT2uMMZvrSJ"
+        dataElementName: "Amount of Exempted Cost for Completely Received Free Health Services "
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Other Patients Received Free Health Services in IPD
+      - key: "other_patients_received_free_health_serv_3"
+        dataElement: "JT6R8JDcdm7"
+        dataElementName: "Other Patients Received Free Health Services in IPD"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Pregnant Women of Age ≥ 35 with Gestational Weeks (28 - 36)
+      - key: "pregnant_women_of_age_35_with_gestationa_3"
+        dataElement: "yoj2oCbvriM"
+        dataElementName: "Pregnant Women of Age ≥ 35 with Gestational Weeks (28 - 36)"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Pregnant Women with Gestational Weeks (37 - 41) having Grand Multigravida
+      - key: "pregnant_women_with_gestational_weeks_ha_9"
+        dataElement: "FeOTYqWEND5"
+        dataElementName: "Pregnant Women with Gestational Weeks (37 - 41) having Grand Multigravida"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Patients Received Complete Free Health Services
+      - key: "patients_received_complete_free_health_s"
+        dataElement: "kpcheWPcaMi"
+        dataElementName: "Patients Received Complete Free Health Services"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Pregnant Women of Age 20 - 34 with Gestational Weeks (≥ 42)
+      - key: "v_34_with_gestational_weeks_3"
+        dataElement: "NNa4syq83FQ"
+        dataElementName: "Pregnant Women of Age 20 - 34 with Gestational Weeks (≥ 42)"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Major Surgeries Done in Emergency
+      - key: "major_surgeries_done_in_emergency_f"  # ← SQL column for: Female
+        dataElement: "CLhWwTR9cvm"
+        dataElementName: "Major Surgeries Done in Emergency"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "major_surgeries_done_in_emergency_m"  # ← SQL column for: Male
+        dataElement: "CLhWwTR9cvm"
+        dataElementName: "Major Surgeries Done in Emergency"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Pregnant Women with Gestational Weeks (37 - 41) having Primigravida
+      - key: "pregnant_women_with_gestational_weeks_ha_10"
+        dataElement: "J16O3bLT94B"
+        dataElementName: "Pregnant Women with Gestational Weeks (37 - 41) having Primigravida"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Senior Citizens of Age > 60 Years Received Free Health Services at Referral Out
+      - key: "senior_citizens_of_age_60_years_received_3"
+        dataElement: "riAMS7MJ8Kz"
+        dataElementName: "Senior Citizens of Age > 60 Years Received Free Health Services at Referral Out"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Amount of Exempted Cost for Partially Received Free Health Services
+      - key: "amount_of_exempted_cost_for_partially_re"
+        dataElement: "eXUI9zdrFSY"
+        dataElementName: "Amount of Exempted Cost for Partially Received Free Health Services"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Gender Based Violence Cases Received Free Health Services in OPD
+      - key: "gender_based_violence_cases_received_fre_3"
+        dataElement: "d5xARcg2y1L"
+        dataElementName: "Gender Based Violence Cases Received Free Health Services in OPD"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Pregnant Women with Gestational Weeks (28 - 36) having Multigravida
+      - key: "pregnant_women_with_gestational_weeks_ha_11"
+        dataElement: "kK32tZ49ToM"
+        dataElementName: "Pregnant Women with Gestational Weeks (28 - 36) having Multigravida"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Total Maternal (All) Deaths in the Hospital
+      - key: "total_maternal_deaths_in_the_hospital_f"  # ← SQL column for: Female
+        dataElement: "OWZvJevMlQd"
+        dataElementName: "Total Maternal (All) Deaths in the Hospital"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "total_maternal_deaths_in_the_hospital_m"  # ← SQL column for: Male
+        dataElement: "OWZvJevMlQd"
+        dataElementName: "Total Maternal (All) Deaths in the Hospital"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Helpless/ Destitute Patients Received Free Health Services at Referral Out
+      - key: "helpless_destitute_patients_received_fre_2"
+        dataElement: "zrx6bskmDpn"
+        dataElementName: "Helpless/ Destitute Patients Received Free Health Services at Referral Out"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Pregnant Women of Age ≥ 35 with Gestational Weeks (22 - 27)
+      - key: "pregnant_women_of_age_35_with_gestationa_4"
+        dataElement: "DmCnfwpVcMT"
+        dataElementName: "Pregnant Women of Age ≥ 35 with Gestational Weeks (22 - 27)"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Cases of Plasters Cast in the Hospital
+      - key: "cases_of_plasters_cast_in_the_hospital_f"  # ← SQL column for: Female
+        dataElement: "bRyy4uqVUn6"
+        dataElementName: "Cases of Plasters Cast in the Hospital"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "cases_of_plasters_cast_in_the_hospital_m"  # ← SQL column for: Male
+        dataElement: "bRyy4uqVUn6"
+        dataElementName: "Cases of Plasters Cast in the Hospital"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Helpless/ Destitute Patients Received Free Health Services in OPD
+      - key: "helpless_destitute_patients_received_fre_3"
+        dataElement: "TQchxgpT1Mg"
+        dataElementName: "Helpless/ Destitute Patients Received Free Health Services in OPD"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Patients Received Partial Free Health Services
+      - key: "patients_received_partial_free_health_se"
+        dataElement: "XFaB9VkN3Sh"
+        dataElementName: "Patients Received Partial Free Health Services"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Senior Citizens of Age > 60 Years Received Free Health Services in OPD
+      - key: "senior_citizens_of_age_60_years_received_4"
+        dataElement: "pGKBCQ2y96V"
+        dataElementName: "Senior Citizens of Age > 60 Years Received Free Health Services in OPD"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Disabled Patients Received Free Health Services in IPD
+      - key: "disabled_patients_received_free_health_s"
+        dataElement: "oLHqNDw8P0e"
+        dataElementName: "Disabled Patients Received Free Health Services in IPD"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Helpless/ Destitute Patients Received Free Health Services in IPD
+      - key: "helpless_destitute_patients_received_fre_4"
+        dataElement: "K2QvU18Cy9V"
+        dataElementName: "Helpless/ Destitute Patients Received Free Health Services in IPD"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Total Postmortems Done in the Hospital
+      - key: "total_postmortems_done_in_the_hospital_f"  # ← SQL column for: Female
+        dataElement: "kkl8yhz37BN"
+        dataElementName: "Total Postmortems Done in the Hospital"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "total_postmortems_done_in_the_hospital_m"  # ← SQL column for: Male
+        dataElement: "kkl8yhz37BN"
+        dataElementName: "Total Postmortems Done in the Hospital"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Total Brought Dead Cases in the Hospital
+      - key: "total_brought_dead_cases_in_the_hospit_f"  # ← SQL column for: Female
+        dataElement: "w9XVaxfPr9F"
+        dataElementName: "Total Brought Dead Cases in the Hospital"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "total_brought_dead_cases_in_the_hospit_m"  # ← SQL column for: Male
+        dataElement: "w9XVaxfPr9F"
+        dataElementName: "Total Brought Dead Cases in the Hospital"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Disabled Patients Received Free Health Services in Emergency
+      - key: "disabled_patients_received_free_health_s_2"
+        dataElement: "xkfNycS7hEG"
+        dataElementName: "Disabled Patients Received Free Health Services in Emergency"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Gender Based Violence Cases Received Free Health Services in IPD
+      - key: "gender_based_violence_cases_received_fre_4"
+        dataElement: "WYnBzcM4iwO"
+        dataElementName: "Gender Based Violence Cases Received Free Health Services in IPD"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Total Post-Operative Deaths in the Hospital
+      - key: "operative_deaths_in_the_hospital_f"  # ← SQL column for: Female
+        dataElement: "HUtoMj9IIHY"
+        dataElementName: "Total Post-Operative Deaths in the Hospital"
+        categoryOptionCombo: "ye1QuAMRG5Z"
+        categoryOptionComboName: "Female"
+      - key: "operative_deaths_in_the_hospital_m"  # ← SQL column for: Male
+        dataElement: "HUtoMj9IIHY"
+        dataElementName: "Total Post-Operative Deaths in the Hospital"
+        categoryOptionCombo: "PflKpozpO7b"
+        categoryOptionComboName: "Male"
+
+      # Pregnant Women with Gestational Weeks (22 - 27) having Primigravida
+      - key: "pregnant_women_with_gestational_weeks_ha_12"
+        dataElement: "Iyu2jI3uZLe"
+        dataElementName: "Pregnant Women with Gestational Weeks (22 - 27) having Primigravida"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Disabled Patients Received Free Health Services in OPD
+      - key: "disabled_patients_received_free_health_s_3"
+        dataElement: "U0aYCzqSIrV"
+        dataElementName: "Disabled Patients Received Free Health Services in OPD"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Pregnant Women of Age 20 - 34 with Gestational Weeks (22 - 27)
+      - key: "v_34_with_gestational_weeks_4"
+        dataElement: "Ynoi7oT6Cui"
+        dataElementName: "Pregnant Women of Age 20 - 34 with Gestational Weeks (22 - 27)"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Other Patients Received Free Health Services in OPD
+      - key: "other_patients_received_free_health_serv_4"
+        dataElement: "xD4PTWeBft4"
+        dataElementName: "Other Patients Received Free Health Services in OPD"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Pregnant Women of Age <20 with Gestational Weeks (22 - 27)
+      - key: "pregnant_women_of_age_20_with_gestationa_3"
+        dataElement: "LLtybn3Il5y"
+        dataElementName: "Pregnant Women of Age <20 with Gestational Weeks (22 - 27)"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+      # Pregnant Women of Age <20 with Gestational Weeks (37 - 41)
+      - key: "pregnant_women_of_age_20_with_gestationa_4"
+        dataElement: "i4LqEvJTyyH"
+        dataElementName: "Pregnant Women of Age <20 with Gestational Weeks (37 - 41)"
+        categoryOptionCombo: "kdsirVNKdhm"
+        categoryOptionComboName: "default"
+
+validation:
+  abort_on_invalid_ids: true   # abort sync if any ID no longer exists in DHIS2
+  warn_on_empty_result:  true   # warn (don't abort) if SQL returns no rows
+  dry_run:               false  # true = build payload but don't submit
+
+audit:
+  enabled:         true
+  directory:       "./audit_logs"
+  retention_days:  365
