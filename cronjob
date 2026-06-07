@@ -1,0 +1,1 @@
+* * * * * cd <nidan-docker path> && /bin/bash ./backup_bahmni_standard.sh >> /var/log/bahmni-backup.log 2>&1
