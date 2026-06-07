@@ -30,7 +30,7 @@ jobs:
       - name: Build and Push
         uses: docker/build-push-action@v6
         with:
-          context: ./openmrs-db
-          file: ./openmrs-db/Dockerfile
+          context: openmrs-db
+          file: openmrs-db/Dockerfile
           push: true
           tags: trigonaltechnology/openmrs-db:latest
