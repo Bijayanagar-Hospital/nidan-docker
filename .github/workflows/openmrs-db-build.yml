@@ -29,7 +29,6 @@ jobs:
 build-and-push:
 runs-on: ubuntu-latest
 
-```
 permissions:
   contents: read
   packages: write
@@ -83,4 +82,3 @@ steps:
       labels: ${{ steps.meta.outputs.labels }}
       cache-from: type=gha,scope=openmrs-db
       cache-to: type=gha,mode=max,scope=openmrs-db
-```
