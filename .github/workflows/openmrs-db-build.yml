@@ -23,7 +23,7 @@ jobs:
 build:
 runs-on: ubuntu-latest
 
-```
+
 permissions:
   contents: read
 
@@ -54,4 +54,3 @@ steps:
       file: ./openmrs-db/Dockerfile
       push: ${{ github.event_name != 'pull_request' }}
       tags: ${{ steps.meta.outputs.tags }}
-```
