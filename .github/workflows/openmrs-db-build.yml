@@ -24,7 +24,7 @@ build:
 name: Build & Push openmrs-db
 runs-on: ubuntu-latest
 
-```
+
 permissions:
   contents: read
 
@@ -68,4 +68,4 @@ steps:
       labels: ${{ steps.meta.outputs.labels }}
       cache-from: type=gha,scope=openmrs-db
       cache-to: type=gha,mode=max,scope=openmrs-db
-```
+
