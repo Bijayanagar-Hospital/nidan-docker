@@ -251,7 +251,7 @@ services:
   # ORTHANC
   # ============================================================================
   orthanc:
-    image: orthancteam/orthanc:25.10
+    image: orthancteam/orthanc:26.6.0
     container_name: nidan-orthanc
     ports:
       - "8042:8042" # HTTP/REST API
