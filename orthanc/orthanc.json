@@ -1,4 +1,14 @@
 {
+    // STATIC configuration only (server ports, plugin settings, DICOM AET).
+    //
+    // This file does NOT define the database, storage, or auth config. Those are
+    // injected at runtime via ORTHANC__* environment variables in docker-compose.yml:
+    //   - ORTHANC__POSTGRESQL__ENABLE_INDEX=true    -> index/metadata in PostgreSQL (orthanc-db)
+    //   - ORTHANC__POSTGRESQL__ENABLE_STORAGE=false -> DICOM *files* on the FILESYSTEM
+    //        (default StorageDirectory /var/lib/orthanc/db, backed by the `orthanc-data` volume)
+    //   - ORTHANC__REGISTERED_USERS                 -> HTTP Basic credentials
+    // Source of truth for DB/storage/auth is docker-compose.yml, not this file.
+    // (Orthanc's config parser permits // comments.)
     "Name": "Nidan Orthanc",
     "Plugins": [ "/usr/share/orthanc/plugins" ],
     "DicomServerEnabled": true,

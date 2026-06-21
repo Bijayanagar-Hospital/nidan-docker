@@ -65,7 +65,12 @@ backup_container_file_system $openmrs_service_name "/openmrs/data/configuration_
 log_info "Taking backup for Odoo Files"
 backup_container_file_system $odoo_service_name "/var/lib/odoo/filestore" "$BACKUP_ROOT_FOLDER"
 
-log_info "Taking backup for orthanc worklists" 
+# Backs up ALL of /var/lib/orthanc, which contains BOTH:
+#   - db/        -> DICOM file storage (ENABLE_STORAGE=false => images on filesystem, not in PG)
+#   - worklists/ -> MWL .wl files
+# Do NOT narrow this to /var/lib/orthanc/worklists or you will silently drop all imaging from backups.
+# The PG index alone (orthancdb_backup.sql) is useless without these files; restore needs both.
+log_info "Taking backup for Orthanc DICOM storage + worklists (/var/lib/orthanc)"
 backup_container_file_system $orthanc_service_name "/var/lib/orthanc" "$BACKUP_ROOT_FOLDER"
 
 log_info "Taking backup for Dhis2 Mappings"

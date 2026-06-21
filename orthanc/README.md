@@ -19,7 +19,7 @@ orthanc/
 | **Worklists** | Modality Worklist SCP - responds to C-FIND MWL queries |
 | **DICOMweb** | WADO-RS, QIDO-RS, STOW-RS APIs |
 | **OHIF** | Integrated OHIF viewer |
-| **PostgreSQL** | Database storage backend |
+| **PostgreSQL** | Index/metadata backend (`ENABLE_INDEX=true`). DICOM files are **not** in PG — they live on the filesystem (`ENABLE_STORAGE=false`), default `StorageDirectory` `/var/lib/orthanc/db`, backed by the `orthanc-data` volume |
 | **Orthanc Explorer 2** | Modern web UI |
 
 ## Configuration Approach
