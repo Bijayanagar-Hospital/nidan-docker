@@ -19,7 +19,6 @@ ARG CACHE_BUST
 COPY nidan-docker/openmrs/pom.xml ./
 COPY nidan-docker/openmrs/distro ./distro/
 COPY nidan-docker/openmrs/custom_modules /openmrs_distro/custom_modules/
-COPY nidan-docker/openmrs/nidan-dialect /openmrs_distro/nidan-dialect/
 
 # Copy LOCAL content (includes liquibase fixes)
 COPY openmrs-backend/openmrs-content-referenceapplication-demo /tmp/openmrs-content-referenceapplication-demo
@@ -38,7 +37,6 @@ RUN --mount=type=cache,target=/root/.m2 \
         -DgroupId=org.bahmni.module -DartifactId=medication-administration-omod \
         -Dversion=2.0.0-SNAPSHOT -Dpackaging=jar -q; break; \
     done && \
-    mvn -f /openmrs_distro/nidan-dialect/pom.xml package -DskipTests -q && \
     \
     sed -i "s|<version>1.8.0-SNAPSHOT</version>|<version>${CONTENT_VERSION}</version>|" /tmp/openmrs-content-referenceapplication-demo/pom.xml && \
     mvn $MVN_ARGS_SETTINGS -T 1C -f /tmp/openmrs-content-referenceapplication-demo/pom.xml install -DskipTests -q && \
@@ -47,7 +45,6 @@ RUN --mount=type=cache,target=/root/.m2 \
     mvn $MVN_ARGS_SETTINGS -T 1C clean install -Dmaven.deploy.skip=true && \
     \
     cp /openmrs_distro/distro/target/sdk-distro/web/openmrs_core/openmrs.war /openmrs/distribution/openmrs_core/ && \
-    (mkdir -p /tmp/war-add/WEB-INF/lib && cp /openmrs_distro/nidan-dialect/target/nidan-dialect-1.0.0.jar /tmp/war-add/WEB-INF/lib/ && cd /tmp/war-add && jar uf /openmrs/distribution/openmrs_core/openmrs.war WEB-INF/lib/nidan-dialect-1.0.0.jar) && \
     cp /openmrs_distro/distro/target/sdk-distro/web/openmrs-distro.properties /openmrs/distribution/ && \
     cp -R /openmrs_distro/distro/target/sdk-distro/web/openmrs_modules /openmrs/distribution/openmrs_modules/ && \
     cp -R /openmrs_distro/distro/target/sdk-distro/web/openmrs_owas /openmrs/distribution/openmrs_owas/ && \
@@ -60,7 +57,7 @@ RUN --mount=type=cache,target=/root/.m2 \
 ### Run stage (production)
 FROM openmrs/openmrs-core:2.8.x-amazoncorretto-21
 
-# Copy built artifacts (nidan-dialect JAR is embedded in openmrs.war WEB-INF/lib)
+# Copy built artifacts
 COPY --from=dev /openmrs/distribution/openmrs_core/openmrs.war /openmrs/distribution/openmrs_core/
 COPY --from=dev /openmrs/distribution/openmrs-distro.properties /openmrs/distribution/
 COPY --from=dev /openmrs/distribution/openmrs_modules /openmrs/distribution/openmrs_modules

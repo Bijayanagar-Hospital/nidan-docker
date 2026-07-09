@@ -28,7 +28,6 @@ ARG CACHE_BUST
 COPY pom.xml ./
 COPY distro ./distro/
 COPY custom_modules /openmrs_distro/custom_modules/
-COPY nidan-dialect /openmrs_distro/nidan-dialect/
 
 # Copy cloned content
 COPY --from=content-clone /content /tmp/openmrs-content-referenceapplication-demo
@@ -40,8 +39,6 @@ RUN \
     echo "statsEnabled=false" > sdk-stats.properties && \
     echo "CACHE_BUST=${CACHE_BUST}" >/dev/null && \
     \
-    mvn -f /openmrs_distro/nidan-dialect/pom.xml package -DskipTests -q && \
-    \
     sed -i "s|<version>1.8.0-SNAPSHOT</version>|<version>${CONTENT_VERSION}</version>|" /tmp/openmrs-content-referenceapplication-demo/pom.xml && \
     mvn $MVN_ARGS_SETTINGS -f /tmp/openmrs-content-referenceapplication-demo/pom.xml install -DskipTests -q && \
     \
@@ -49,7 +46,6 @@ RUN \
     mvn $MVN_ARGS_SETTINGS clean install -Dmaven.deploy.skip=true && \
     \
     cp /openmrs_distro/distro/target/sdk-distro/web/openmrs_core/openmrs.war /openmrs/distribution/openmrs_core/ && \
-    (mkdir -p /tmp/war-add/WEB-INF/lib && cp /openmrs_distro/nidan-dialect/target/nidan-dialect-1.0.0.jar /tmp/war-add/WEB-INF/lib/ && cd /tmp/war-add && jar uf /openmrs/distribution/openmrs_core/openmrs.war WEB-INF/lib/nidan-dialect-1.0.0.jar) && \
     cp /openmrs_distro/distro/target/sdk-distro/web/openmrs-distro.properties /openmrs/distribution/ && \
     cp -R /openmrs_distro/distro/target/sdk-distro/web/openmrs_modules /openmrs/distribution/openmrs_modules/ && \
     cp -R /openmrs_distro/distro/target/sdk-distro/web/openmrs_owas /openmrs/distribution/openmrs_owas/ && \
@@ -62,7 +58,7 @@ RUN \
 ### Run stage (production)
 FROM openmrs/openmrs-core:2.8.x-amazoncorretto-21
 
-# Copy built artifacts from dev stage (nidan-dialect JAR is embedded in openmrs.war WEB-INF/lib)
+# Copy built artifacts from dev stage
 COPY --from=dev /openmrs/distribution/openmrs_core/openmrs.war /openmrs/distribution/openmrs_core/
 COPY --from=dev /openmrs/distribution/openmrs-distro.properties /openmrs/distribution/
 COPY --from=dev /openmrs/distribution/openmrs_modules /openmrs/distribution/openmrs_modules
