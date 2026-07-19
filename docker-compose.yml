@@ -64,6 +64,7 @@ services:
   # # OPENMRS
   # # ============================================================================
   openmrs-backend:
+    profiles: ["openmrs","nidanehr-standard"]
     build: ./openmrs
     image: trigonaltechnology/openmrs-backend:latest
     # image: openmrs-backend:local
@@ -118,6 +119,7 @@ services:
     #   args:
     #     NIDAN_CALENDAR_BUNDLE: "1.0.0-v9"   # bump after repacking the tgz
     # Vanilla upstream SPA (no BS calendar): dockerfile: Dockerfile.vanilla
+    profiles: ["openmrs","nidanehr-standard"]
     image: trigonaltechnology/openmrs-frontend:latest
     container_name: nidan-openmrs-frontend
     environment:
@@ -141,6 +143,7 @@ services:
 
   openmrs-db:
     #image: mariadb:10.11
+    profiles: ["openmrs","nidanehr-standard"]
     image: trigonaltechnology/openmrs-db:latest
     container_name: nidan-openmrs-db
     # Debezium/CIS: row-based binlog events for wide rows must fit max_allowed_packet (error 1236 if too small).
@@ -196,6 +199,7 @@ services:
     # (e.g. trigonaltechnology/nidan_odoo_pro:stable) which bakes the closed-source
     # addons into /mnt/private-addons. No host addon source is mounted in prod.
     # image: ${ODOO_IMAGE:-trigonaltechnology/nidan_odoo:stable}
+    profiles: ["odoo","nidanehr-standard"]
     image: trigonaltechnology/nidan_odoo_pro:latest
     container_name: nidan-odoo
     command: sh -c "odoo -d \${ODOO_DB_NAME:-nidan} --proxy-mode --dev=xml -u all"
@@ -243,6 +247,7 @@ services:
       start_period: 60s
 
   odoo-db:
+    profiles: ["odoo","nidanehr-standard"]
     image: postgres:15
     container_name: nidan-odoo-db
     environment:
@@ -268,6 +273,7 @@ services:
   # ORTHANC
   # ============================================================================
   orthanc:
+    profiles: ["orthanc","nidanehr-standard"]
     image: orthancteam/orthanc:26.6.0
     container_name: nidan-orthanc
     ports:
@@ -322,6 +328,7 @@ services:
       start_period: 30s
 
   orthanc-db:
+    profiles: ["orthanc","nidanehr-standard"]
     image: postgres:15
     container_name: nidan-orthanc-db
     environment:
@@ -373,6 +380,7 @@ services:
 
   # OpenELIS backend (Tomcat) - FIXED with HTTP enabled
   openelis:
+    profiles: ["openelis","nidanehr-standard"]
     image: trigonaltechnology/openelis-global-2:latest
     platform: linux/amd64
     container_name: nidan-openelis
@@ -435,6 +443,7 @@ services:
 
   # OpenELIS Frontend
   openelis-frontend:
+    profiles: ["openelis","nidanehr-standard"]
     image: trigonaltechnology/openelis-global-2-frontend:latest
     container_name: nidan-openelis-frontend
     platform: linux/amd64
@@ -452,6 +461,7 @@ services:
   # NIDAN INTEGRATION MIDDLEWARE (Kafka + Postgres + CIS/OIS)
   # ============================================================================
   nidan-integration-db:
+    profiles: ["middleware","nidanehr-standard"]
     image: postgres:15
     container_name: nidan-integration-db
     environment:
@@ -470,6 +480,7 @@ services:
 
   # Zookeeper for Kafka (Confluent images)
   nidan-zookeeper:
+    profiles: ["middleware","nidanehr-standard"]
     image: confluentinc/cp-zookeeper:7.5.0
     container_name: nidan-zookeeper
     environment:
@@ -487,6 +498,7 @@ services:
     restart: unless-stopped
 
   nidan-kafka:
+    profiles: ["middleware","nidanehr-standard"]
     image: confluentinc/cp-kafka:7.5.0
     container_name: nidan-kafka
     environment:
@@ -523,6 +535,7 @@ services:
     restart: unless-stopped
 
   nidan-cis:
+    profiles: ["middleware","nidanehr-standard"]
     image: ${NIDAN_CIS_IMAGE:-nidan-cis:local}
     container_name: nidan-cis
     ports:
@@ -655,6 +668,7 @@ services:
       start_period: 60s
 
   nidan-ois:
+    profiles: ["middleware","nidanehr-standard"]
     image: ${NIDAN_OIS_IMAGE:-nidan-ois:local}
     container_name: nidan-ois
     ports:
@@ -730,6 +744,7 @@ services:
   # DHIS2 / FEDERAL HMIS INTEGRATION
   # ============================================================================
   nidan-dhis2-db:
+    profiles: ["dhis2","nidanehr-standard"]
     image: mysql:8.0
     container_name: nidan-dhis2-db
     environment:
@@ -749,6 +764,7 @@ services:
     restart: unless-stopped
 
   nidan-dhis2:
+    profiles: ["dhis2","nidanehr-standard"]
     image: trigonaltechnology/nidan-dhis2-integration:latest
     container_name: nidan-dhis2
     ports:
@@ -820,6 +836,7 @@ services:
   # APACHE SUPERSET
   # ============================================================================
   superset:
+    profiles: ["superset","nidanehr-standard"]
     build: ./superset
     image: ${SUPERSET_IMAGE:-trigonaltechnology/superset:latest}
     container_name: nidan-superset
