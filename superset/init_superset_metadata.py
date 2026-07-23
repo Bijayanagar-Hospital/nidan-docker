@@ -276,16 +276,16 @@ def build_dataset_specs():
         "db": "openmrs", "table_name": "fct_bed_assignments", "dttm": "assigned_at",
         "sql": """
             SELECT
-                bpam.id AS assignment_id,
+                bpam.bed_patient_assignment_map_id AS assignment_id,
                 bpam.patient_id,
-                bpam.start_datetime AS assigned_at,
-                bpam.end_datetime AS released_at,
+                bpam.date_started AS assigned_at,
+                bpam.date_stopped AS released_at,
                 COALESCE(b.bed_number, 'Unknown') AS bed_number,
                 COALESCE(bt.name, 'Unknown') AS bed_type,
                 COALESCE(loc.name, 'Unknown') AS ward,
-                CASE WHEN bpam.end_datetime IS NULL THEN 'Occupied' ELSE 'Released' END AS bed_status,
-                TIMESTAMPDIFF(SECOND, bpam.start_datetime,
-                    COALESCE(bpam.end_datetime, NOW())) / 86400.0 AS bed_days
+                CASE WHEN bpam.date_stopped IS NULL THEN 'Occupied' ELSE 'Released' END AS bed_status,
+                TIMESTAMPDIFF(SECOND, bpam.date_started,
+                    COALESCE(bpam.date_stopped, NOW())) / 86400.0 AS bed_days
             FROM bed_patient_assignment_map bpam
             JOIN bed b ON bpam.bed_id = b.bed_id
             LEFT JOIN bed_type bt ON b.bed_type_id = bt.bed_type_id
