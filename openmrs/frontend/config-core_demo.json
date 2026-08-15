@@ -16,6 +16,7 @@
         "order": [
           "vitals-overview-widget",
           "biometrics-overview-widget",
+          "active-forms-overview-widget",
           "visit-overview-widget",
           "encounter-overview-widget",
           "diagnosis-overview-widget",
@@ -73,7 +74,10 @@
     "defaultFacilityUrl": ""
   },
   "@openmrs/esm-styleguide": {
-    "Brand color #1": "#005d5d"
+    "Brand color #3": "#0082A8",
+    "Brand color #1": "#006D8F",
+    "Brand color #2": "#003B5C",
+    "implementationName": "NidanEHR"
   },
   "@kenyaemr/esm-imaging-orders-app": {
     "radiologyConceptSetUuid": "cd9f116c-517d-439e-847d-d8d257434083",
@@ -204,6 +208,30 @@
           "patient-lists-dashboard-link"
         ]
       }
+    }
+  },
+  "@openmrs/esm-primary-navigation-app": {
+    "extensionSlots": {
+      "user-panel-slot": {
+        "add": [
+          "location-changer"
+        ]
+      },
+      "top-nav-info-slot": {
+        "remove": [
+          "location-changer"
+        ]
+      }
+    },
+    "logo": {
+      "src": "${openmrsSpaBase}/nidan-logo-white.png",
+      "alt": "NidanEHR"
+    }
+  },
+  "@openmrs/esm-login-app": {
+    "logo": {
+      "src": "${openmrsSpaBase}/nidan-logo-full.png",
+      "alt": "Logo"
     }
   }
 }
