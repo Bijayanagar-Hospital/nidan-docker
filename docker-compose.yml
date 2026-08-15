@@ -30,7 +30,7 @@ services:
   gateway:
     # build: ./proxy  # local dev: docker compose build gateway
     # CI: dev → trigonaltechnology/gateway:latest | main → :stable
-    image: ${GATEWAY_IMAGE:-trigonaltechnology/gateway:latest}
+    image: ${GATEWAY_IMAGE:-bijayanagarhospital/gateway:latest}
     ports:
       - "80:80"
       - "443:443"
@@ -66,7 +66,7 @@ services:
   openmrs-backend:
     profiles: ["openmrs","nidanehr-standard"]
     build: ./openmrs
-    image: trigonaltechnology/openmrs-backend:latest
+    image: bijayanagarhospital/openmrs-backend:latest
     # image: openmrs-backend:local
     # user: root
     container_name: nidan-openmrs-backend
@@ -120,7 +120,7 @@ services:
     #     NIDAN_CALENDAR_BUNDLE: "1.0.0-v9"   # bump after repacking the tgz
     # Vanilla upstream SPA (no BS calendar): dockerfile: Dockerfile.vanilla
     profiles: ["openmrs","nidanehr-standard"]
-    image: trigonaltechnology/openmrs-frontend:latest
+    image: bijayanagarhospital/openmrs-frontend:latest
     container_name: nidan-openmrs-frontend
     environment:
       - SPA_PATH=/openmrs/spa
@@ -143,6 +143,7 @@ services:
 
   openmrs-db:
     #image: mariadb:10.11
+    Image: bijayanagarhospital/openmrs-d:latest
     profiles: ["openmrs","nidanehr-standard"]
     image: trigonaltechnology/openmrs-db:latest
     container_name: nidan-openmrs-db
@@ -198,9 +199,9 @@ services:
     # Open-source base by default; hospitals set ODOO_IMAGE to the private image
     # (e.g. trigonaltechnology/nidan_odoo_pro:stable) which bakes the closed-source
     # addons into /mnt/private-addons. No host addon source is mounted in prod.
-    # image: ${ODOO_IMAGE:-trigonaltechnology/nidan_odoo:stable}
+    # image: ${ODOO_IMAGE:-bijayanagarhospital/nidan_odoo:stable}
     profiles: ["odoo","nidanehr-standard"]
-    image: trigonaltechnology/nidan_odoo_pro:latest
+    image: bijayanagarhospital/nidan_odoo:latest
     container_name: nidan-odoo
     command: sh -c "odoo -d \${ODOO_DB_NAME:-nidan} --proxy-mode --dev=xml -u all"
     ports:
@@ -845,7 +846,7 @@ services:
   superset:
     profiles: ["superset","nidanehr-standard"]
     build: ./superset
-    image: ${SUPERSET_IMAGE:-trigonaltechnology/superset:latest}
+    image: ${SUPERSET_IMAGE:-bijayanagarhospital/superset:latest}
     container_name: nidan-superset
     ports:
       - "8088:8088" # Keep for direct access during debugging, remove in production
