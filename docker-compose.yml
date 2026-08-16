@@ -111,6 +111,7 @@ services:
       timeout: 10s
       retries: 15
       start_period: 1200s
+    restart: unless-stopped  
 
   openmrs-frontend:
     # build:
@@ -140,6 +141,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    restart: unless-stopped  
 
   openmrs-db:
     #image: mariadb:10.11
@@ -165,7 +167,8 @@ services:
       - openmrs-db-data:/var/lib/mysql
     networks:
       - nidan-network
-
+    restart: unless-stopped
+    
   # PostgreSQL for OpenMRS - commented out for now
   # openmrs-db-postgres:
   #   image: postgres:15-alpine
@@ -245,7 +248,8 @@ services:
       timeout: 10s
       retries: 5
       start_period: 60s
-
+    restart: unless-stopped
+    
   odoo-db:
     profiles: ["odoo","nidanehr-standard"]
     image: postgres:15
@@ -268,7 +272,8 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-
+    restart: unless-stopped
+   
   # ============================================================================
   # ORTHANC
   # ============================================================================
@@ -326,7 +331,8 @@ services:
       timeout: 10s
       retries: 5
       start_period: 30s
-
+    restart: unless-stopped
+    
   orthanc-db:
     profiles: ["orthanc","nidanehr-standard"]
     image: postgres:15
@@ -339,7 +345,8 @@ services:
       - orthanc-db-data:/var/lib/postgresql/data
     networks:
       - nidan-network
-
+    restart: unless-stopped
+    
   # ============================================================================
   # OPENELIS (Placeholder)
   # ============================================================================
@@ -355,7 +362,8 @@ services:
       - certbot-www:/var/www/certbot
     networks:
       - nidan-network
-
+    restart: unless-stopped
+    
   openelis-db:
     image: trigonaltechnology/openelis-global-2-database:latest
     container_name: nidan-openelis-db
@@ -377,7 +385,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
+    restart: unless-stopped
+    
   # OpenELIS backend (Tomcat) - FIXED with HTTP enabled
   openelis:
     profiles: ["openelis","nidanehr-standard"]
@@ -456,7 +465,8 @@ services:
       - REACT_APP_SERVER_BASE=/api/OpenELIS-Global # This tells frontend where backend is
     networks:
       - nidan-network
-
+    restart: unless-stopped
+    
   # ============================================================================
   # NIDAN INTEGRATION MIDDLEWARE (Kafka + Postgres + CIS/OIS)
   # ============================================================================
@@ -477,7 +487,8 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-
+    restart: unless-stopped
+    
   # Zookeeper for Kafka (Confluent images)
   nidan-zookeeper:
     profiles: ["middleware","nidanehr-standard"]
@@ -673,7 +684,8 @@ services:
       timeout: 10s
       retries: 5
       start_period: 60s
-
+    restart: unless-stopped
+    
   nidan-ois:
     profiles: ["middleware","nidanehr-standard"]
     image: ${NIDAN_OIS_IMAGE:-nidan-ois:local}
@@ -746,7 +758,8 @@ services:
       timeout: 10s
       retries: 5
       start_period: 60s
-
+    restart: unless-stopped
+    
   # ============================================================================
   # DHIS2 / FEDERAL HMIS INTEGRATION
   # ============================================================================
@@ -871,7 +884,7 @@ services:
       SUPERSET_PORT: '8088'
       # Fix health check path issue
       SUPERSET_HEALTH_CHECK_ENDPOINT: /health
-
+       
       # Database connections (seeded at startup for OpenMRS, OpenELIS, Odoo)
       OPENMRS_DB_HOST: ${OPENMRS_DB_HOST:-openmrs-db}
       OPENMRS_DB_PORT: ${OPENMRS_DB_PORT:-3306}
