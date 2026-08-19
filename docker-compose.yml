@@ -30,7 +30,7 @@ services:
   gateway:
     # build: ./proxy  # local dev: docker compose build gateway
     # CI: dev → trigonaltechnology/gateway:latest | main → :stable
-    image: ${GATEWAY_IMAGE:-trigonaltechnology/gateway:latest}
+    image: ${GATEWAY_IMAGE:-bijayanagarhospital/gateway:latest}
     ports:
       - "80:80"
       - "443:443"
@@ -68,7 +68,7 @@ services:
   openmrs-backend:
     profiles: ["openmrs","nidanehr-standard"]
     build: ./openmrs
-    image: trigonaltechnology/openmrs-backend:latest
+    image: bijayanagarhospital/openmrs-backend:latest
     # image: openmrs-backend:local
     # user: root
     container_name: nidan-openmrs-backend
@@ -106,13 +106,14 @@ services:
     volumes:
       - openmrs-data:/openmrs/data
       # Optional dev: mount locally-built OMODs (startup.sh copies *.omod into data/modules on start).
-      # - ./openmrs/custom_modules:/openmrs/custom_modules:ro
+      - ./openmrs/custom_modules:/openmrs/custom_modules:ro
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8080/openmrs/" ]
       interval: 30s
       timeout: 10s
       retries: 15
       start_period: 1200s
+    restart: unless-stopped  
 
   openmrs-frontend:
     # build:
@@ -122,7 +123,7 @@ services:
     #     NIDAN_CALENDAR_BUNDLE: "1.0.0-v9"   # bump after repacking the tgz
     # Vanilla upstream SPA (no BS calendar): dockerfile: Dockerfile.vanilla
     profiles: ["openmrs","nidanehr-standard"]
-    image: trigonaltechnology/openmrs-frontend:latest
+    image: bijayanagarhospital/openmrs-frontend:latest
     container_name: nidan-openmrs-frontend
     environment:
       - SPA_PATH=/openmrs/spa
@@ -142,11 +143,12 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    restart: unless-stopped  
 
   openmrs-db:
     #image: mariadb:10.11
     profiles: ["openmrs","nidanehr-standard"]
-    image: trigonaltechnology/openmrs-db:latest
+    image: bijayanagarhospital/openmrs-db:latest
     container_name: nidan-openmrs-db
     # Debezium/CIS: row-based binlog events for wide rows must fit max_allowed_packet (error 1236 if too small).
     command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --log-bin=mysql-bin --binlog_format=ROW --server-id=1 --binlog_row_image=FULL --max-allowed-packet=512M
@@ -167,7 +169,8 @@ services:
       - openmrs-db-data:/var/lib/mysql
     networks:
       - nidan-network
-
+    restart: unless-stopped
+    
   # PostgreSQL for OpenMRS - commented out for now
   # openmrs-db-postgres:
   #   image: postgres:15-alpine
@@ -200,9 +203,9 @@ services:
     # Open-source base by default; hospitals set ODOO_IMAGE to the private image
     # (e.g. trigonaltechnology/nidan_odoo_pro:stable) which bakes the closed-source
     # addons into /mnt/private-addons. No host addon source is mounted in prod.
-    # image: ${ODOO_IMAGE:-trigonaltechnology/nidan_odoo:stable}
+    # image: ${ODOO_IMAGE:-bijayanagarhospital/nidan_odoo:stable}
     profiles: ["odoo","nidanehr-standard"]
-    image: trigonaltechnology/nidan_odoo_pro:latest
+    image: bijayanagarhospital/nidan_odoo:latest
     container_name: nidan-odoo
     command: sh -c "odoo -d \${ODOO_DB_NAME:-nidan} --proxy-mode --dev=xml -u all"
     ports:
@@ -231,9 +234,9 @@ services:
       - odoo-data:/var/lib/odoo
       # Addons come from the image (baked at /mnt/extra-addons + /mnt/private-addons).
       # No host addon source should be mounted in prod.
-      # - ${ODOO_ADDONS_PATH:-../odoo_19_addons}:/mnt/extra-addons
+      - ${ODOO_ADDONS_PATH:-../odoo_19_addons}:/mnt/extra-addons
       # Mount the private/closed-source addons for live editing in dev
-      # - ${ODOO_PRIVATE_ADDONS_HOST_PATH:-../nidan_odoo_extra_addons}:/mnt/private-addons
+      - ${ODOO_PRIVATE_ADDONS_HOST_PATH:-../nidan_odoo_extra_addons}:/mnt/private-addons
       # odoo.conf from git (read-only). Entrypoint copies to container; runtime changes stay in container.
       - ./odoo/odoo.conf:/mnt/odoo.conf.template:ro
     networks:
@@ -247,7 +250,8 @@ services:
       timeout: 10s
       retries: 5
       start_period: 60s
-
+    restart: unless-stopped
+    
   odoo-db:
     profiles: ["odoo","nidanehr-standard"]
     image: postgres:15
@@ -270,7 +274,8 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-
+    restart: unless-stopped
+   
   # ============================================================================
   # ORTHANC
   # ============================================================================
@@ -328,7 +333,8 @@ services:
       timeout: 10s
       retries: 5
       start_period: 30s
-
+    restart: unless-stopped
+    
   orthanc-db:
     profiles: ["orthanc","nidanehr-standard"]
     image: postgres:15
@@ -341,7 +347,8 @@ services:
       - orthanc-db-data:/var/lib/postgresql/data
     networks:
       - nidan-network
-
+    restart: unless-stopped
+    
   # ============================================================================
   # OPENELIS (Placeholder)
   # ============================================================================
@@ -357,7 +364,8 @@ services:
       - certbot-www:/var/www/certbot
     networks:
       - nidan-network
-
+    restart: unless-stopped
+    
   openelis-db:
     image: trigonaltechnology/openelis-global-2-database:latest
     container_name: nidan-openelis-db
@@ -379,7 +387,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
+    restart: unless-stopped
+    
   # OpenELIS backend (Tomcat) - FIXED with HTTP enabled
   openelis:
     profiles: ["openelis","nidanehr-standard"]
@@ -458,7 +467,8 @@ services:
       - REACT_APP_SERVER_BASE=/api/OpenELIS-Global # This tells frontend where backend is
     networks:
       - nidan-network
-
+    restart: unless-stopped
+    
   # ============================================================================
   # NIDAN INTEGRATION MIDDLEWARE (Kafka + Postgres + CIS/OIS)
   # ============================================================================
@@ -479,7 +489,8 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-
+    restart: unless-stopped
+    
   # Zookeeper for Kafka (Confluent images)
   nidan-zookeeper:
     profiles: ["middleware","nidanehr-standard"]
@@ -675,7 +686,8 @@ services:
       timeout: 10s
       retries: 5
       start_period: 60s
-
+    restart: unless-stopped
+    
   nidan-ois:
     profiles: ["middleware","nidanehr-standard"]
     image: ${NIDAN_OIS_IMAGE:-nidan-ois:local}
@@ -748,7 +760,8 @@ services:
       timeout: 10s
       retries: 5
       start_period: 60s
-
+    restart: unless-stopped
+    
   # ============================================================================
   # DHIS2 / FEDERAL HMIS INTEGRATION
   # ============================================================================
@@ -847,7 +860,7 @@ services:
   superset:
     profiles: ["superset","nidanehr-standard"]
     build: ./superset
-    image: ${SUPERSET_IMAGE:-trigonaltechnology/superset:latest}
+    image: ${SUPERSET_IMAGE:-bijayanagarhospital/superset:latest}
     container_name: nidan-superset
     ports:
       - "8088:8088" # Keep for direct access during debugging, remove in production
@@ -873,7 +886,7 @@ services:
       SUPERSET_PORT: '8088'
       # Fix health check path issue
       SUPERSET_HEALTH_CHECK_ENDPOINT: /health
-
+       
       # Database connections (seeded at startup for OpenMRS, OpenELIS, Odoo)
       OPENMRS_DB_HOST: ${OPENMRS_DB_HOST:-openmrs-db}
       OPENMRS_DB_PORT: ${OPENMRS_DB_PORT:-3306}
