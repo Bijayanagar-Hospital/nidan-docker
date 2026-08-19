@@ -1,5 +1,5 @@
 # Environment variables
-.env
+.env*
 
 # Legacy backup (archived old Bahmni-based configuration)
 _backup_legacy/
