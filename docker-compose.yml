@@ -37,6 +37,8 @@ services:
       - "8443:8443"
     environment:
       - GATEWAY_DOMAIN=${GATEWAY_DOMAIN:-localhost}
+      # Extra names for the self-signed cert (comma separated, openssl SAN syntax)
+      - GATEWAY_CERT_SANS=${GATEWAY_CERT_SANS:-}
       - OPENELIS_DOMAIN=${OPENELIS_DOMAIN}
       # OpenELIS context path (must match the backend SERVER_SERVLET_CONTEXT_PATH)
       - OPENELIS_CONTEXT_PATH=${OPENELIS_CONTEXT_PATH:-/api/OpenELIS-Global/}
