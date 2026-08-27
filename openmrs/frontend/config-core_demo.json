@@ -49,6 +49,30 @@
       }
     ]
   },
+  "@trigonal/esm-report-app": {
+    "hospitalName": "Basic Health Service Hospital Bijaynagar",
+    "hospitalAddress": "Khurhuriya, Kapilvastu, Lumbini",
+    "hospitalContactInfo": "",
+    "hospitalLetterheadTopLines": [
+      "Lumbini province government",
+      "Ministry of health",
+      "health directorate"
+    ],
+    "hospitalLetterheadBottomLines": [],
+    "printLetterhead": true,
+    "patientSummaryDocument": {
+      "excludeObsForms": [
+        "55fcfbee-6510-3abb-b2da-dbd0d5353b2e",
+        "de010f04-2eb5-3a9c-afec-587868f3c2fa"
+      ]
+    },
+    "dischargeNote": {
+      "excludeObsForms": [
+        "55fcfbee-6510-3abb-b2da-dbd0d5353b2e",
+        "de010f04-2eb5-3a9c-afec-587868f3c2fa"
+      ]
+    }
+  },
   "@openmrs/esm-service-queues-app": {
     "statusConfigs": [
       {
