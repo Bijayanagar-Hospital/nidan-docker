@@ -49,7 +49,7 @@
       }
     ]
   },
-  "@trigonal/esm-report-app": {
+ "@trigonal/esm-patient-report-app": {
     "hospitalName": "Basic Health Service Hospital Bijaynagar",
     "hospitalAddress": "Khurhuriya, Kapilvastu, Lumbini",
     "hospitalContactInfo": "",
