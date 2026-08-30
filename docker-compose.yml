@@ -444,6 +444,7 @@ services:
       - openelis-lucene-index:/var/lib/lucene_index
       - ./openelis/volume/properties/common.properties:/run/secrets/common.properties:ro
       - ./openelis/volume/certs:/etc/openelis-global:ro
+      - ./openelis/volume/branding:/var/lib/openelis-global/branding
     healthcheck:
       test: [ "CMD-SHELL", "curl -f http://localhost:8080/OpenELIS-Global/ || exit 1" ]
       interval: 30s
